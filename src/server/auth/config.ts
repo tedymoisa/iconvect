@@ -32,7 +32,7 @@ declare module "next-auth" {
  */
 export const authConfig = {
   providers: [
-    GitHub
+    GitHub,
     /**
      * ...add more providers here.
      *
@@ -49,8 +49,8 @@ export const authConfig = {
       ...session,
       user: {
         ...session.user,
-        id: user.id
-      }
-    })
-  }
+        id: user.id,
+      },
+    }),
+  },
 } satisfies NextAuthConfig;
