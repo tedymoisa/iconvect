@@ -1,3 +1,5 @@
+import Navbar from "@/components/navbar";
+import { ThemeProvider } from "@/components/theme-provider";
 import "@/styles/globals.css";
 
 import { GeistSans } from "geist/font/sans";
@@ -12,9 +14,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
-      <body>
-        <SessionProvider>{children}</SessionProvider>
+    <html lang="en" className={`${GeistSans.variable} h-dvh w-full`} suppressHydrationWarning={true}>
+      <body className="relative bg-black">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true} disableTransitionOnChange={true}>
+          <SessionProvider>
+            <Navbar />
+            <div className="pt-96">{children}</div>
+          </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
