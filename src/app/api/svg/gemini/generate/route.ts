@@ -1,10 +1,10 @@
-import { ApiResponse } from "@/lib/types/api-response";
-import { extractAndSanitizeSvg, formatZodError, readBody, sanitizeSvg, validate } from "@/lib/utils";
+import { type ApiResponse } from "@/lib/types/api-response";
+import { extractAndSanitizeSvg, formatZodError, readBody, validate } from "@/lib/utils";
 import { auth } from "@/server/auth";
 import { geminiClient } from "@/server/gemini";
 import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import { NextAuthRequest } from "node_modules/next-auth/lib";
+import { type NextAuthRequest } from "node_modules/next-auth/lib";
 import { z } from "zod";
 
 const defaultModel = "gemini-2.5-pro-exp-03-25";
@@ -12,7 +12,7 @@ const systemInstruction = `
 Act as an SVG code generator.
 Strict rules:
 1. Root <svg> MUST have: xmlns='http://www.w3.org/2000/svg' and viewBox='0 0 24 24'.
-2. Default style for elements: stroke='black', fill='none', stroke-width='1'. Apply unless prompt specifies otherwise.
+2. Default style for elements: fill='currentColor', stroke-width='1'. Apply unless prompt specifies otherwise.
 3. Output ONLY raw SVG code, starting with <svg> and ending with </svg>. Keep the svg simple but efficient.
 4. NO other text, explanations, or comments outside the code block.
 `;
@@ -75,5 +75,11 @@ export const POST = auth(async function POST(req: NextAuthRequest) {
     return NextResponse.json<ApiResponse<string>>({ result: "Error generating svg" }, { status: 422 });
   }
 
-  return NextResponse.json<ApiResponse<string>>({ result: extractAndSanitizeSvg(svg)! }, { status: 200 });
+  const sanitizedSvg = await extractAndSanitizeSvg(svg);
+
+  if (!sanitizedSvg || svg.length === 0) {
+    return NextResponse.json<ApiResponse<string>>({ result: "Error generating svg" }, { status: 422 });
+  }
+
+  return NextResponse.json<ApiResponse<string>>({ result: sanitizedSvg }, { status: 200 });
 });

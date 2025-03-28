@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 
 function Test() {
@@ -7,7 +8,7 @@ function Test() {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState("");
 
-  const fetchData = async (value: string) => {
+  const fetchData = async () => {
     setIsLoading(true);
 
     fetch("/api/svg", {
@@ -22,7 +23,7 @@ function Test() {
           throw new Error(`HTTP error! status: ${res.status}`);
         }
 
-        const data = await res.json();
+        const data = (await res.json()) as { result: string };
         setData(data.result);
       })
       .catch((error) => console.error("Error:", error))
@@ -31,6 +32,7 @@ function Test() {
 
   const svgDataUri = useMemo(() => {
     if (!data) return null;
+
     try {
       const base64Svg = btoa(data);
 
@@ -50,10 +52,10 @@ function Test() {
           onChange={(event) => setValue(event.target.value)}
           className="m-4 w-[36rem] rounded-md p-4"
         />
-        <button onClick={() => fetchData(value)}>click</button>
+        <button onClick={() => fetchData()}>click</button>
       </div>
       {isLoading && <span>Loading...</span>}
-      {data && <img src={svgDataUri!} alt="Error generating image" className="size-28" />}
+      {data && <Image src={svgDataUri!} alt="Error generating image" width={28} height={28} />}
       {data && (
         <pre className="svg-code-block">
           <code>{data}</code>

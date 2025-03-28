@@ -1,4 +1,4 @@
-import { ApiResponse } from "@/lib/types/api-response";
+import { type ApiResponse } from "@/lib/types/api-response";
 import { extractAndSanitizeSvg } from "@/lib/utils";
 import { NextResponse } from "next/server";
 

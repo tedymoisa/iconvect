@@ -1,9 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
-import { NextRequest } from "next/server";
-import { twMerge } from "tailwind-merge";
-import { SafeParseReturnType, ZodError, ZodSchema } from "zod";
 import DOMPurify from "dompurify";
-import { JSDOM } from "jsdom";
+import { type NextRequest } from "next/server";
+import { twMerge } from "tailwind-merge";
+import { type SafeParseReturnType, type ZodError, type ZodSchema } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -16,13 +15,9 @@ export function validate<T>(payload: T, schema: ZodSchema) {
 }
 
 export async function readBody<T>(req: NextRequest): Promise<T> {
-  try {
-    const rawBody = await req.text();
+  const rawBody = await req.text();
 
-    return JSON.parse(rawBody) as T;
-  } catch (error) {
-    throw new Error("Failed to parse request body as JSON");
-  }
+  return JSON.parse(rawBody) as T;
 }
 
 export function formatZodError(error: ZodError) {
@@ -39,51 +34,43 @@ export function formatZodError(error: ZodError) {
   return formattedErrors;
 }
 
-export function sanitizeSvg(rawSvgString: string | null | undefined): string | null {
-  if (!rawSvgString || typeof rawSvgString !== "string") {
-    console.warn("Invalid input provided for SVG sanitization.");
-    return null;
-  }
+// export async function sanitizeSvg(rawSvgString: string): Promise<string | null> {
+//   const { JSDOM } = await import("jsdom");
 
-  try {
-    const window = new JSDOM("").window;
+//   try {
+//     const window = new JSDOM("").window;
 
-    const purify = DOMPurify(window);
+//     const purify = DOMPurify(window);
 
-    const cleanSvg = purify.sanitize(rawSvgString, {
-      USE_PROFILES: { svg: true, svgFilters: true }
-    });
+//     const cleanSvg = purify.sanitize(rawSvgString, {
+//       USE_PROFILES: { svg: true, svgFilters: true }
+//     });
 
-    if (cleanSvg.trim() === "") {
-      console.warn("Sanitization resulted in an empty string. Input might have been invalid or purely malicious.");
+//     if (cleanSvg.trim() === "") {
+//       console.warn("Sanitization resulted in an empty string. Input might have been invalid or purely malicious.");
 
-      return null;
-    }
+//       return null;
+//     }
 
-    return cleanSvg;
-  } catch (error) {
-    console.error("Error during SVG sanitization:", error);
-    return null; // Return null on failure
-  }
-}
+//     return cleanSvg;
+//   } catch (error) {
+//     console.error("Error during SVG sanitization:", error);
 
-export function extractAndSanitizeSvg(rawAiResponse: string | null | undefined): string | null {
-  if (!rawAiResponse || typeof rawAiResponse !== "string") {
-    console.warn("Invalid input provided for SVG extraction.");
-    return null;
-  }
+//     return null;
+//   }
+// }
 
-  // Regex to match ```xml...``` or ```svg...``` and capture the content
+export async function extractAndSanitizeSvg(rawAiResponse: string): Promise<string | null> {
   const svgRegex = /```(?:xml|svg)\n([\s\S]*?)\n```/;
-  const match = rawAiResponse.match(svgRegex);
+  const match = svgRegex.exec(rawAiResponse);
 
-  if (match && match[1]) {
+  if (match?.[1]) {
     const extractedSvg = match[1].trim(); // Get the captured group (SVG code) and trim whitespace
     if (extractedSvg) {
-      // Sanitize the extracted SVG code
-      return sanitizeSvg(extractedSvg);
+      return extractedSvg;
     } else {
       console.warn("Extracted SVG content is empty.");
+
       return null;
     }
   } else {

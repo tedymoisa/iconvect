@@ -1,8 +1,10 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 
 export default function Navbar() {
+  const { data: session } = useSession();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isCursorAtTop, setIsCursorAtTop] = useState(false);
@@ -50,6 +52,7 @@ export default function Navbar() {
     >
       <div className="mx-20 my-8 rounded-lg bg-purple-600 bg-opacity-10 p-14 shadow-sm shadow-purple-600/50 ring-1 ring-purple-800/30 backdrop-blur-md">
         <h1>Navbar</h1>
+        <p>{session ? "Logged in" : "Logged out"}</p>
       </div>
     </div>
   );
