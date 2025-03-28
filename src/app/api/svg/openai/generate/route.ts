@@ -1,9 +1,9 @@
-import { ApiResponse } from "@/lib/types/api-response";
+import { type ApiResponse } from "@/lib/types/api-response";
 import { formatZodError, readBody, validate } from "@/lib/utils";
 import { auth } from "@/server/auth";
 import { openaiClient } from "@/server/openai";
 import { NextResponse } from "next/server";
-import { NextAuthRequest } from "node_modules/next-auth/lib";
+import { type NextAuthRequest } from "node_modules/next-auth/lib";
 import { z } from "zod";
 
 const defaultModel = "gpt-4o-mini";
@@ -50,8 +50,7 @@ export const POST = auth(async function POST(req: NextAuthRequest) {
 
   if (
     completion.choices.length === 0 ||
-    !completion.choices[0] ||
-    !completion.choices[0].message.content
+    !completion.choices[0]?.message.content
   ) {
     return NextResponse.json<ApiResponse<string>>(
       { result: "Error generating svg" },

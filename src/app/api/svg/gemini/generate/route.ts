@@ -1,10 +1,10 @@
-import { ApiResponse } from "@/lib/types/api-response";
-import { extractAndSanitizeSvg, formatZodError, readBody, sanitizeSvg, validate } from "@/lib/utils";
+import { type ApiResponse } from "@/lib/types/api-response";
+import { extractAndSanitizeSvg, formatZodError, readBody, validate } from "@/lib/utils";
 import { auth } from "@/server/auth";
 import { geminiClient } from "@/server/gemini";
 import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import { NextAuthRequest } from "node_modules/next-auth/lib";
+import { type NextAuthRequest } from "node_modules/next-auth/lib";
 import { z } from "zod";
 
 const defaultModel = "gemini-2.5-pro-exp-03-25";

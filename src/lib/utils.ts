@@ -1,9 +1,9 @@
 import { clsx, type ClassValue } from "clsx";
-import { NextRequest } from "next/server";
-import { twMerge } from "tailwind-merge";
-import { SafeParseReturnType, ZodError, ZodSchema } from "zod";
 import DOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
+import { type NextRequest } from "next/server";
+import { twMerge } from "tailwind-merge";
+import { type SafeParseReturnType, type ZodError, type ZodSchema } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -16,13 +16,9 @@ export function validate<T>(payload: T, schema: ZodSchema) {
 }
 
 export async function readBody<T>(req: NextRequest): Promise<T> {
-  try {
-    const rawBody = await req.text();
+  const rawBody = await req.text();
 
-    return JSON.parse(rawBody) as T;
-  } catch (error) {
-    throw new Error("Failed to parse request body as JSON");
-  }
+  return JSON.parse(rawBody) as T;
 }
 
 export function formatZodError(error: ZodError) {
@@ -75,9 +71,9 @@ export function extractAndSanitizeSvg(rawAiResponse: string | null | undefined):
 
   // Regex to match ```xml...``` or ```svg...``` and capture the content
   const svgRegex = /```(?:xml|svg)\n([\s\S]*?)\n```/;
-  const match = rawAiResponse.match(svgRegex);
+  const match = svgRegex.exec(rawAiResponse);
 
-  if (match && match[1]) {
+  if (match?.[1]) {
     const extractedSvg = match[1].trim(); // Get the captured group (SVG code) and trim whitespace
     if (extractedSvg) {
       // Sanitize the extracted SVG code
