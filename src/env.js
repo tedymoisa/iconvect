@@ -16,6 +16,7 @@ export const env = createEnv({
     OPENAI_MODEL: z.string().optional(),
     GOOGLE_API_KEY: z.string(),
     GOOGLE_GEMINI_MODEL: z.string().optional(),
+    STRIPE_SECRET_KEY: z.string(),
     DATABASE_URL: z.string().url(),
     NODE_ENV: z.enum(["development", "test", "production"]).default("development")
   },
@@ -43,6 +44,7 @@ export const env = createEnv({
     OPENAI_MODEL: process.env.OPENAI_MODEL,
     GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
     GOOGLE_GEMINI_MODEL: process.env.GOOGLE_GEMINI_MODEL,
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV
   },
