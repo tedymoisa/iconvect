@@ -27,7 +27,8 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    NEXT_PUBLIC_API_URL: z.string()
+    NEXT_PUBLIC_API_URL: z.string(),
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string()
   },
 
   /**
@@ -45,6 +46,7 @@ export const env = createEnv({
     OPENAI_MODEL: process.env.OPENAI_MODEL,
     GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
     GOOGLE_GEMINI_MODEL: process.env.GOOGLE_GEMINI_MODEL,
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV
