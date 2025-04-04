@@ -1,5 +1,4 @@
 import { clsx, type ClassValue } from "clsx";
-import DOMPurify from "dompurify";
 import { type NextRequest } from "next/server";
 import { twMerge } from "tailwind-merge";
 import { type SafeParseReturnType, type ZodError, type ZodSchema } from "zod";
@@ -25,9 +24,8 @@ export function formatZodError(error: ZodError) {
 
   for (const issue of error.issues) {
     const path = issue.path.join(".");
-    if (!formattedErrors[path]) {
-      formattedErrors[path] = [];
-    }
+
+    formattedErrors[path] ??= [];
     formattedErrors[path].push(issue.message);
   }
 

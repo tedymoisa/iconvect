@@ -15,11 +15,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable} h-dvh w-full`} suppressHydrationWarning={true}>
-      <body className="relative bg-black">
+      <body className="bg-background dark:bg-background_dark relative">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true} disableTransitionOnChange={true}>
           <SessionProvider>
             <Navbar />
-            <div className="pt-96">{children}</div>
+            <div className="pt-40">{children}</div>
           </SessionProvider>
         </ThemeProvider>
       </body>

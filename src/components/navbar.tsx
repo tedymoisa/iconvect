@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -45,15 +45,17 @@ export default function Navbar() {
   }, [lastScrollY, isCursorAtTop]);
 
   return (
-    <div
-      className={`fixed left-0 top-0 w-full transition-transform duration-300 ${
+    <nav
+      className={`fixed left-0 top-0 z-50 w-full transition-transform duration-300 ease-in-out ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <div className="mx-20 my-8 rounded-lg bg-purple-600 bg-opacity-10 p-14 shadow-sm shadow-purple-600/50 ring-1 ring-purple-800/30 backdrop-blur-md">
-        <h1>Navbar</h1>
-        <p>{session ? "Logged in" : "Logged out"}</p>
+      <div className="bg-background border-border dark:border-border_dark mx-auto my-8 max-w-6xl rounded-lg border p-4 shadow-lg dark:bg-slate-900 sm:p-6 md:p-8">
+        <h1 className="text-primary text-xl font-semibold">Vecto</h1>
+        <p className="text-foreground-muted dark:text-foreground-muted_dark text-sm">
+          {session ? "Logged in" : "Logged out"}
+        </p>
       </div>
-    </div>
+    </nav>
   );
 }

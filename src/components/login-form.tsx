@@ -7,8 +7,8 @@ import { Github } from "lucide-react";
 import { signIn } from "next-auth/react";
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
-  const handleLogin = (provider: string) => {
-    signIn(provider);
+  const handleLogin = async (provider: string) => {
+    await signIn(provider);
   };
 
   return (

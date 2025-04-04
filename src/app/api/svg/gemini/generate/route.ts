@@ -3,8 +3,7 @@ import { extractAndSanitizeSvg, formatZodError, readBody, validate } from "@/lib
 import { auth } from "@/server/auth";
 import { geminiClient } from "@/server/gemini";
 import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
-import { NextResponse } from "next/server";
-import { type NextAuthRequest } from "node_modules/next-auth/lib";
+import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const defaultModel = "gemini-2.5-pro-exp-03-25";
@@ -35,8 +34,9 @@ const svgGenerateSchema = z.object({
 });
 export type SvgGenerate = z.infer<typeof svgGenerateSchema>;
 
-export const POST = auth(async function POST(req: NextAuthRequest) {
-  if (!req.auth) return NextResponse.json<ApiResponse<string>>({ result: "Not authenticated" }, { status: 401 });
+export async function POST(req: NextRequest) {
+  const authSession = await auth();
+  if (!authSession) return NextResponse.json<ApiResponse<string>>({ result: "Not authenticated" }, { status: 401 });
 
   const body = await readBody<SvgGenerate>(req);
   const { error, data } = validate(body, svgGenerateSchema);
@@ -82,4 +82,4 @@ export const POST = auth(async function POST(req: NextAuthRequest) {
   }
 
   return NextResponse.json<ApiResponse<string>>({ result: sanitizedSvg }, { status: 200 });
-});
+}
