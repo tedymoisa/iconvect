@@ -1,6 +1,7 @@
 import { CheckIcon } from "lucide-react";
 import { useMemo } from "react";
 import type Stripe from "stripe";
+import PurchaseNowButton from "./purchase-now-button";
 
 export default function PriceCards({ prices }: { prices: Stripe.Price[] }) {
   const sortedPrices = useMemo(() => {
@@ -16,7 +17,7 @@ export default function PriceCards({ prices }: { prices: Stripe.Price[] }) {
     <div className="mx-auto flex max-w-6xl flex-col items-center justify-center gap-12 md:flex-row md:items-stretch">
       {sortedPrices.map((price) => {
         const product = price.product as Stripe.Product;
-        const isPopular = product.metadata?.popular === "true";
+        const isPopular = product.metadata.popular === "true";
         const credits = Number.parseInt(product.metadata?.credits ?? "0");
         const amount = price.unit_amount ? (price.unit_amount / 100).toFixed(2) : "0.00";
 
@@ -64,15 +65,7 @@ export default function PriceCards({ prices }: { prices: Stripe.Price[] }) {
                 ))}
               </div>
 
-              <button
-                className={`w-full rounded-md px-4 py-2 font-medium transition-colors ${
-                  isPopular
-                    ? "bg-primary hover:bg-primary/90 text-primary-foreground"
-                    : "text-foreground dark:text-foreground_dark bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
-                }`}
-              >
-                Purchase Now
-              </button>
+              <PurchaseNowButton price={price} />
             </div>
           </div>
         );
