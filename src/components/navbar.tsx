@@ -9,6 +9,8 @@ export default function Navbar() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isCursorAtTop, setIsCursorAtTop] = useState(false);
 
+  console.log(session?.user.credits, session?.user.status);
+
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -50,11 +52,12 @@ export default function Navbar() {
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <div className="bg-background border-border dark:border-border_dark mx-auto my-8 max-w-6xl rounded-lg border p-4 shadow-lg dark:bg-slate-900 sm:p-6 md:p-8">
-        <h1 className="text-primary text-xl font-semibold">Vecto</h1>
-        <p className="text-foreground-muted dark:text-foreground-muted_dark text-sm">
+      <div className="mx-auto my-8 max-w-6xl rounded-lg border border-border bg-background p-4 shadow-lg dark:border-border_dark dark:bg-slate-900 sm:p-6 md:p-8">
+        <h1 className="text-xl font-semibold text-primary">Vecto</h1>
+        <p className="text-sm text-foreground-muted dark:text-foreground-muted_dark">
           {session ? "Logged in" : "Logged out"}
         </p>
+        <p>Credits: {session?.user.credits}</p>
       </div>
     </nav>
   );

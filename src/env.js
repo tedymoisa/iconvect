@@ -8,6 +8,7 @@ export const env = createEnv({
    */
   server: {
     AUTH_SECRET: process.env.NODE_ENV === "production" ? z.string() : z.string().optional(),
+    AUTH_TRUST_HOST: process.env.NODE_ENV === "production" ? z.string().optional() : z.string(),
     AUTH_GITHUB_ID: z.string(),
     AUTH_GITHUB_SECRET: z.string(),
     OPENAI_API_KEY: z.string(),
@@ -17,6 +18,7 @@ export const env = createEnv({
     GOOGLE_API_KEY: z.string(),
     GOOGLE_GEMINI_MODEL: z.string().optional(),
     STRIPE_SECRET_KEY: z.string(),
+    STRIPE_WEBHOOK_SECRET: z.string(),
     DATABASE_URL: z.string().url(),
     NODE_ENV: z.enum(["development", "test", "production"]).default("development")
   },
@@ -38,6 +40,7 @@ export const env = createEnv({
   runtimeEnv: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     AUTH_SECRET: process.env.AUTH_SECRET,
+    AUTH_TRUST_HOST: process.env.NODE_ENV === "production" ? "false" : process.env.AUTH_TRUST_HOST,
     AUTH_GITHUB_ID: process.env.AUTH_GITHUB_ID,
     AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
@@ -48,6 +51,7 @@ export const env = createEnv({
     GOOGLE_GEMINI_MODEL: process.env.GOOGLE_GEMINI_MODEL,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV
   },
