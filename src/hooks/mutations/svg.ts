@@ -6,12 +6,13 @@ import { sleep } from "openai/core.mjs";
 
 export function useSvgGenerate() {
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (prompt: string) => {
       // const { data } = await axios.post<ApiResponse<string>>(`${apiUrl}/api/svg/gemini/generate`, {
       //   prompt
       // });
 
       // return data.result;
+      console.log(prompt);
       const { data } = await axios.get<ApiResponse<string>>(`${apiUrl}/api/svg`);
 
       await sleep(5000);

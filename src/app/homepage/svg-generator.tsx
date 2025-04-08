@@ -9,7 +9,7 @@ export default function SvgGenerator() {
         <div className="mb-4 flex items-center gap-3">
           <Sparkles className="h-6 w-6 shrink-0 text-primary dark:text-secondary" />
           <h2 className="text-xl font-semibold text-foreground dark:text-foreground_dark md:text-2xl">
-            Create with Vecto
+            What can I generate for you?
           </h2>
         </div>
         <p className="mb-6 text-base text-foreground-muted dark:text-foreground-muted_dark">
