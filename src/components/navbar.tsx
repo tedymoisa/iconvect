@@ -9,8 +9,6 @@ export default function Navbar() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isCursorAtTop, setIsCursorAtTop] = useState(false);
 
-  console.log(session?.user.credits, session?.user.status);
-
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
