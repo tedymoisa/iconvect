@@ -1,10 +1,9 @@
 import Navbar from "@/components/navbar";
-import { ThemeProvider } from "@/components/theme-provider";
 import "@/styles/globals.css";
 
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
-import { SessionProvider } from "next-auth/react";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -15,13 +14,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable} h-dvh w-full`} suppressHydrationWarning={true}>
-      <body className="relative bg-black">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true} disableTransitionOnChange={true}>
-          <SessionProvider>
-            <Navbar />
-            <div className="pt-96">{children}</div>
-          </SessionProvider>
-        </ThemeProvider>
+      <body className="relative bg-background dark:bg-background_dark">
+        <Providers>
+          <Navbar />
+          <div className="pt-40">{children}</div>
+        </Providers>
       </body>
     </html>
   );
