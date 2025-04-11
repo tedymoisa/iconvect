@@ -1,17 +1,17 @@
 "use client";
 
 import Loader from "@/components/loader";
-import { useCheckoutSession } from "@/hooks/mutations/stripe";
+import { api } from "@/trpc/react";
 import type Stripe from "stripe";
 
 export default function PurchaseNowButton({ price }: { price: Stripe.Price }) {
   const product = price.product as Stripe.Product;
   const isPopular = product.metadata.popular === "true";
 
-  const { mutate, isPending } = useCheckoutSession();
+  const { mutate, isPending } = api.stripe.createCheckoutSession.useMutation();
 
   const handlePurchase = () => {
-    mutate(price.id);
+    mutate({ priceId: price.id });
   };
 
   return (
