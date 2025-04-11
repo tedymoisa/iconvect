@@ -87,11 +87,11 @@ export const stripeRouter = createTRPCRouter({
           });
         }
 
-        const successUrl = `${apiUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
-        const cancelUrl = `${apiUrl}/payment-cancelled`;
+        const successUrl = `${apiUrl}`;
+        const cancelUrl = `${apiUrl}`;
 
         const checkoutSession = await stripeClient.checkout.sessions.create({
-          payment_method_types: ["card", "paypal"], // Add others if needed
+          payment_method_types: ["card", "paypal"],
           mode: "payment",
           line_items: [
             {
