@@ -2,8 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useSvgGenerate } from "@/hooks/mutations/svg";
+import { scrollPage } from "@/lib/utils";
 import { useSvgStore } from "@/store/svg";
+import { api } from "@/trpc/react";
 import { Loader2, MousePointerClick } from "lucide-react";
 import { useState } from "react";
 
@@ -11,12 +12,16 @@ export default function GeneratorPrompt() {
   const setGeneratedSvg = useSvgStore((state) => state.setGeneratedSvg);
   const [prompt, setPrompt] = useState("");
 
-  const { mutate, isPending } = useSvgGenerate();
+  const { mutate, isPending } = api.post.generate.useMutation();
 
   const handleGenerate = () => {
     if (prompt.length >= 0) {
-      mutate(prompt, {
-        onSuccess: () => setGeneratedSvg(prompt)
+      mutate(undefined, {
+        onSuccess: (data) => {
+          setGeneratedSvg(data.svg);
+
+          scrollPage(300, 1000);
+        }
       });
     }
   };

@@ -12,8 +12,9 @@ Act as an SVG code generator.
 Strict rules:
 1. Root <svg> MUST have: xmlns='http://www.w3.org/2000/svg' and viewBox='0 0 24 24'.
 2. Default style for elements: fill='currentColor', stroke-width='1'. Apply unless prompt specifies otherwise.
-3. Output ONLY raw SVG code, starting with <svg> and ending with </svg>. Keep the svg simple but efficient.
-4. NO other text, explanations, or comments outside the code block.
+3. Design: Complex and iconic but visually clear. Define and separate shapes effectively using thin strokes or white spaces.
+4. Output ONLY raw SVG code, starting with <svg> and ending with </svg>. Keep the svg code simple but efficient.
+5. NO other text, explanations, or comments outside the code block.
 `;
 const safetySettings = [
   { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
