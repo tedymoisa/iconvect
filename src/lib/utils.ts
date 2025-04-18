@@ -32,6 +32,28 @@ export function formatZodError(error: ZodError) {
   return formattedErrors;
 }
 
+export function scrollPage(by: number, duration: number) {
+  const start = window.scrollY;
+  const target = start + by;
+
+  if (Math.abs(window.scrollY - target) < 1) return;
+
+  const startTime = performance.now();
+
+  const step = (currentTime: number) => {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const easeInOut = 0.5 * (1 - Math.cos(Math.PI * progress));
+    window.scrollTo(0, start + by * easeInOut);
+
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    }
+  };
+
+  requestAnimationFrame(step);
+}
+
 // export async function sanitizeSvg(rawSvgString: string): Promise<string | null> {
 //   const { JSDOM } = await import("jsdom");
 
