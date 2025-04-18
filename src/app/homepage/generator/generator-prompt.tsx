@@ -26,7 +26,7 @@ export default function GeneratorPrompt() {
       <div className="mb-5">
         <Textarea
           placeholder="e.g., A pencil that represents editing"
-          className="min-h-[120px] resize-none rounded-md border border-border bg-background p-4 text-base shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background dark:border-slate-800 dark:bg-slate-900 dark:placeholder:text-slate-500"
+          className="min-h-[120px] resize-none border-border text-base transition-colors duration-200 ease-in-out focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" // Keep ring but make border primary on focus
           value={prompt}
           onChange={(event) => setPrompt(event.target.value)}
           aria-label="SVG generation prompt"
@@ -36,18 +36,19 @@ export default function GeneratorPrompt() {
       <div className="flex justify-end">
         <Button
           onClick={handleGenerate}
-          className="h-12 bg-gradient-to-r from-primary to-secondary transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-60 dark:text-primary-foreground"
+          className="h-12 px-6 text-base"
           disabled={isPending || !prompt.trim()}
+          size="lg"
         >
           {isPending ? (
             <>
-              <Loader2 className="mr-1 animate-spin" />
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               <span>Generating...</span>
             </>
           ) : (
             <>
-              <MousePointerClick className="mr-1" />
-              <span className="text-base">Generate</span>
+              <MousePointerClick className="mr-2 h-5 w-5" />
+              <span>Generate</span>
             </>
           )}
         </Button>

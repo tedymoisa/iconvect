@@ -1,23 +1,28 @@
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 import GeneratorPrompt from "./generator/generator-prompt";
 
 export default function SvgGenerator() {
   return (
-    <Card className="overflow-hidden border border-border bg-background shadow-md dark:border-border_dark dark:bg-background_dark">
-      <div className="p-6 md:p-8">
-        <div className="mb-4 flex items-center gap-3">
-          <Sparkles className="h-6 w-6 shrink-0 text-primary dark:text-secondary" />
-          <h2 className="text-xl font-semibold text-foreground dark:text-foreground_dark md:text-2xl">
-            What can I generate for you?
-          </h2>
-        </div>
-        <p className="mb-6 text-base text-foreground-muted dark:text-foreground-muted_dark">
-          Describe the vector graphic you want to generate using natural language.
-        </p>
+    <Card className="bg-card relative overflow-hidden border border-border shadow-lg shadow-purple-950/20">
+      <div className="absolute left-0 top-0 h-1 w-full bg-primary"></div>
 
+      <CardHeader className="relative flex flex-row items-start gap-x-4 space-y-0 border-b border-border pb-6 pt-8">
+        <div className="mt-1 flex-shrink-0 rounded-full bg-primary/10 p-2">
+          <Sparkles className="h-5 w-5 text-purple-400" />
+        </div>
+        <div className="flex-grow">
+          <CardTitle className="bg-gradient-to-br from-purple-400 to-purple-600 bg-clip-text text-xl font-semibold tracking-tight text-transparent md:text-2xl">
+            What can I generate for you?
+          </CardTitle>
+          <p className="text-muted-foreground mt-1 text-base">
+            Describe the vector graphic you want to generate using natural language.
+          </p>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-6">
         <GeneratorPrompt />
-      </div>
+      </CardContent>
     </Card>
   );
 }

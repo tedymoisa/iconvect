@@ -1,6 +1,5 @@
 import { type Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
-import colors from "tailwindcss/colors";
 
 export default {
   darkMode: ["class"],
@@ -16,58 +15,80 @@ export default {
         sm: "calc(var(--radius) - 4px)"
       },
       colors: {
-        // --- Core Palette ---
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: colors.purple[600],
-          foreground: colors.white // Text on primary bg
-          // Optional: Add shades if needed frequently
-          // light: colors.purple[400],
-          // dark: colors.purple[800],
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))"
         },
         secondary: {
-          DEFAULT: colors.teal[500],
-          foreground: colors.white // Text on secondary bg
-          // Optional: Add shades if needed frequently
-          // light: colors.teal[300],
-          // dark: colors.teal[700],
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))"
         },
-
-        // --- Neutrals & Text ---
-        background: colors.white, // Default light background
-        foreground: colors.slate[900], // Default text on light background
-        "foreground-muted": colors.slate[600], // Less important text
-
-        // --- Borders & Accents ---
-        border: colors.slate[200], // Subtle borders on light bg
-        ring: colors.purple[500], // Often used for focus rings (matches primary)
-        accent: colors.slate[500], // Neutral accent for dividers, etc.
-
-        // --- Dark Mode (Optional - can also use 'dark:' prefix) ---
-        // You might prefer using Tailwind's 'dark:' variant instead of separate keys
-        // e.g., <body class="bg-background dark:bg-background-dark">
-        background_dark: colors.slate[950], // Dark background
-        foreground_dark: colors.slate[100], // Text on dark background
-        "foreground-muted_dark": colors.slate[400], // Less important text on dark
-        border_dark: colors.slate[800], // Subtle borders on dark bg
-        accent_dark: colors.slate[600], // Neutral accent on dark bg
-
-        // --- Semantic Colors (Optional) ---
         destructive: {
-          DEFAULT: colors.red[600],
-          foreground: colors.white
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))"
         },
-        success: {
-          DEFAULT: colors.green[600],
-          foreground: colors.white
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))"
         },
-        warning: {
-          DEFAULT: colors.yellow[500],
-          foreground: colors.slate[900] // Dark text often better on yellow
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))"
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))"
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))"
+        },
+        purple: {
+          50: "#faf5ff",
+          100: "#f3e8ff",
+          200: "#e9d5ff",
+          300: "#d8b4fe",
+          400: "#c084fc",
+          500: "#a855f7",
+          600: "#9333ea",
+          700: "#7e22ce",
+          800: "#6b21a8",
+          900: "#581c87",
+          950: "#3b0764"
+        },
+        pink: {
+          50: "#fdf2f8",
+          100: "#fce7f3",
+          200: "#fbcfe8",
+          300: "#f9a8d4",
+          400: "#f472b6",
+          500: "#ec4899",
+          600: "#db2777",
+          700: "#be185d",
+          800: "#9d174d",
+          900: "#831843",
+          950: "#500724"
         }
       },
-      ringColor: ({ theme }) => ({
-        DEFAULT: theme("colors.primary.DEFAULT", colors.purple[600])
-      })
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" }
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" }
+        }
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out"
+      }
     }
   },
   plugins: [require("tailwindcss-animate")]
