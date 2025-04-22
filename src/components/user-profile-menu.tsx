@@ -24,7 +24,7 @@ export default function UserProfileMenu({ session }: { session: Session }) {
           <img src={session.user.image} className="h-8 w-8 rounded-full" />
         ) : (
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-            <span className="text-xs font-medium text-primary">U</span>
+            <span className="text-l font-bold text-primary">{session?.user.name?.charAt(0).toUpperCase()}</span>
           </div>
         )}
       </DropdownMenuTrigger>
