@@ -18,11 +18,17 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
           <CardTitle className="text-xl">Welcome back</CardTitle>
           <CardDescription>Login with your Github or Google account</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-2">
           <div className="flex flex-col gap-4">
             <Button variant="outline" className="w-full" onClick={() => handleLogin("github")}>
               <Github />
               Login with Github
+            </Button>
+          </div>
+          <div className="flex flex-col gap-4">
+            <Button variant="outline" className="w-full" onClick={() => handleLogin("google")}>
+              <Github />
+              Login with Google
             </Button>
           </div>
         </CardContent>
