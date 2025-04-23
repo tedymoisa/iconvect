@@ -27,7 +27,7 @@ export default function HomePage() {
           </h1>
         </div>
 
-        <p className="text-muted-foreground mx-auto max-w-3xl text-lg leading-relaxed md:text-xl">
+        <p className="mx-auto max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
           Transform your ideas into beautiful vector graphics with the power of AI. Leverage cutting-edge models to
           generate unique, scalable artwork instantly.
         </p>

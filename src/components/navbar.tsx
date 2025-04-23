@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import Logo from "./logo";
 import { Button } from "./ui/button";
 import UserProfileIcon from "./user-profile-menu";
-import { User } from "lucide-react";
 
 export default function Navbar() {
   const { data: session } = useSession();

@@ -6,7 +6,6 @@ import { scrollPage } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
 import { useSvgStore } from "@/store/svg";
 import { api } from "@/trpc/react";
-import { api } from "@/trpc/react";
 import { Loader2, MousePointerClick } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
