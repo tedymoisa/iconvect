@@ -1,6 +1,7 @@
 import Logo from "@/components/logo";
 import SvgPreview from "./generator/svg-preview";
 import SvgGenerator from "./svg-generator";
+import { siteConfig } from "@/site-config";
 
 export default function HomePage() {
   return (
@@ -23,7 +24,7 @@ export default function HomePage() {
           <Logo className="h-10 w-auto shrink-0 text-purple-400 md:h-12" />
 
           <h1 className="bg-gradient-to-br from-purple-400 to-purple-600 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent md:text-6xl lg:text-7xl">
-            Vectricon
+            {siteConfig.name}
           </h1>
         </div>
 

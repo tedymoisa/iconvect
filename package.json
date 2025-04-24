@@ -1,7 +1,31 @@
 {
-  "name": "vecto",
+  "name": "iconvect",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "description": "Generate stunning, unique vector icons instantly using the power of AI. Create scalable SVG assets for your projects in seconds.",
+  "author": "kt",
+  "license": "UNLICENSED",
+  "homepage": "https://iconvect.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/project-kt/iconvect.git"
+  },
+  "keywords": [
+    "ai",
+    "svg",
+    "vector",
+    "icons",
+    "generator",
+    "graphics",
+    "design",
+    "ai generator",
+    "nextjs",
+    "react",
+    "prisma",
+    "trpc",
+    "tailwindcss",
+    "next-auth"
+  ],
   "type": "module",
   "scripts": {
     "build": "next build",
