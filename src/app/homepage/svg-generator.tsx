@@ -4,18 +4,18 @@ import GeneratorPrompt from "./generator/generator-prompt";
 
 export default function SvgGenerator() {
   return (
-    <Card className="relative overflow-hidden border border-border bg-card shadow-lg shadow-purple-950/20">
-      <div className="absolute left-0 top-0 h-1 w-full bg-primary"></div>
+    <Card className="border-border bg-card relative overflow-hidden border shadow-lg shadow-purple-950/20">
+      <div className="bg-primary absolute top-0 left-0 h-1 w-full"></div>
 
-      <CardHeader className="relative flex flex-row items-start gap-x-4 space-y-0 border-b border-border pb-6 pt-8">
-        <div className="mt-1 flex-shrink-0 rounded-full bg-primary/10 p-2">
+      <CardHeader className="border-border relative flex flex-row items-start space-y-0 gap-x-4 border-b pt-8 pb-6">
+        <div className="bg-primary/10 mt-1 shrink-0 rounded-full p-2">
           <Sparkles className="h-5 w-5 text-purple-400" />
         </div>
-        <div className="flex-grow">
-          <CardTitle className="bg-gradient-to-br from-purple-400 to-purple-600 bg-clip-text text-xl font-semibold tracking-tight text-transparent md:text-2xl">
+        <div className="grow">
+          <CardTitle className="bg-linear-to-br from-purple-400 to-purple-600 bg-clip-text text-xl font-semibold tracking-tight text-transparent md:text-2xl">
             What can I generate for you?
           </CardTitle>
-          <p className="mt-1 text-base text-muted-foreground">
+          <p className="text-muted-foreground mt-1 text-base">
             Describe the vector graphic you want to generate using natural language.
           </p>
         </div>

@@ -31,8 +31,8 @@ export default function UserProfileMenu({ session }: { session: Session }) {
             />
           </div>
         ) : (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-            <span className="text-l font-bold text-primary">{session?.user.name?.charAt(0).toUpperCase()}</span>
+          <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-full">
+            <span className="text-l text-primary font-bold">{session?.user.name?.charAt(0).toUpperCase()}</span>
           </div>
         )}
       </DropdownMenuTrigger>

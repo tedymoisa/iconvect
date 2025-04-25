@@ -65,24 +65,24 @@ export default function Navbar() {
   return (
     <nav
       className={cn(
-        "fixed left-0 top-0 z-50 w-full transition-transform duration-300 ease-in-out",
+        "fixed top-0 left-0 z-50 w-full transition-transform duration-300 ease-in-out",
         isVisible ? "translate-y-0" : "-translate-y-full"
       )}
     >
       <div className="mx-auto my-3 max-w-5xl px-4">
-        <div className="flex h-16 items-center justify-between rounded-lg border border-border bg-card p-4 shadow-lg shadow-purple-950/20 sm:px-6">
+        <div className="border-border bg-card flex h-16 items-center justify-between rounded-lg border p-4 shadow-lg shadow-purple-950/20 sm:px-6">
           <div className="flex items-center gap-x-4">
-            <Logo className="h-10 w-auto shrink-0 text-primary md:h-12" />
-            <span className="hidden border-l border-border pl-4 text-sm text-muted-foreground sm:block">
+            <Logo className="text-primary h-10 w-auto shrink-0 md:h-12" />
+            <span className="border-border text-muted-foreground hidden border-l pl-4 text-sm sm:block">
               Custom Icons for your projects
             </span>
           </div>
 
           <div className="flex items-center gap-x-4">
             {session && (
-              <div className="hidden rounded-md border border-border/50 bg-muted/50 px-3 py-1 text-sm md:block">
-                <span className="mr-1.5 text-muted-foreground/80">Credits:</span>
-                <span className="font-medium text-primary">{session.user.credits}</span>
+              <div className="border-border/50 bg-muted/50 hidden rounded-md border px-3 py-1 text-sm md:block">
+                <span className="text-muted-foreground/80 mr-1.5">Credits:</span>
+                <span className="text-primary font-medium">{session.user.credits}</span>
               </div>
             )}
             {session ? <UserProfileIcon session={session} /> : <Button onClick={() => setIsOpen(true)}>Login</Button>}

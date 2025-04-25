@@ -14,12 +14,12 @@ export default function SvgPreview() {
 
   if (generatedSvg !== null) {
     return (
-      <Card className="relative mt-8 overflow-hidden border border-border bg-card shadow-lg shadow-purple-950/20">
-        <div className="absolute left-0 top-0 h-1 w-full bg-primary"></div>
+      <Card className="border-border bg-card relative mt-8 overflow-hidden border shadow-lg shadow-purple-950/20">
+        <div className="bg-primary absolute top-0 left-0 h-1 w-full"></div>
 
-        <Tabs defaultValue="preview" className="px-6 pb-6 pt-8 md:px-8 md:pb-8 md:pt-10">
+        <Tabs defaultValue="preview" className="px-6 pt-8 pb-6 md:px-8 md:pt-10 md:pb-8">
           <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <h3 className="text-lg font-semibold text-foreground md:text-xl">Generated Output</h3>
+            <h3 className="text-foreground text-lg font-semibold md:text-xl">Generated Output</h3>
             <TabsList>
               <TabsTrigger value="preview">
                 <Eye className="mr-1.5 size-4" />
@@ -59,7 +59,7 @@ function CodeTab({ svg }: { svg: string }) {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-border">
+    <div className="border-border relative overflow-hidden rounded-lg border">
       <SyntaxHighlighter
         language="xml"
         style={atomOneDark}
@@ -77,7 +77,7 @@ function CodeTab({ svg }: { svg: string }) {
         variant="ghost"
         size="icon"
         onClick={copyToClipboard}
-        className="absolute right-5 top-2 size-8 text-muted-foreground/70 transition-colors hover:text-muted-foreground"
+        className="text-muted-foreground/70 hover:text-muted-foreground absolute top-2 right-5 size-8 transition-colors"
         aria-label="Copy SVG code"
       >
         {copied ? <Check className="size-4 text-green-500" /> : <Clipboard className="size-4" />}
