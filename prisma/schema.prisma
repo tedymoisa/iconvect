@@ -14,13 +14,48 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum UserStatus {
+    TRIAL
+    SUBSCRIBED
+    CANCELLED
+    BANNED
+}
+
+enum PaymentProvider {
+    STRIPE
+    PAYPAL
+}
+
+enum OrderStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    CANCELLED
+    REFUNDED
+}
+
+enum CreditTransactionType {
+    PURCHASE // Credits bought
+    GENERATION // Credits spent on AI generation
+    TRIAL_GRANT // Initial trial credits
+    REFUND // Credits refunded to user
+    ADJUSTMENT // Manual admin adjustment
+}
+
+enum AiGenerationStatus {
+    PENDING
+    PROCESSING
+    COMPLETED
+    FAILED
+}
+
 // Necessary for Next auth
 model Account {
     id                       String  @id @default(cuid())
-    userId                   String
+    userId                   String  @map("user_id")
     type                     String
     provider                 String
-    providerAccountId        String
+    providerAccountId        String  @map("provider_account_id")
     refresh_token            String? // @db.Text
     access_token             String? // @db.Text
     expires_at               Int?
@@ -32,24 +67,41 @@ model Account {
     refresh_token_expires_in Int?
 
     @@unique([provider, providerAccountId])
+    @@map("accounts")
 }
 
 model Session {
     id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
+    sessionToken String   @unique @map("session_token")
+    userId       String   @map("user_id")
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("sessions")
 }
 
 model User {
     id            String    @id @default(cuid())
     name          String?
     email         String?   @unique
-    emailVerified DateTime?
+    emailVerified DateTime? @map("email_verified")
     image         String?
-    accounts      Account[]
-    sessions      Session[]
+
+    credits     Int        @default(15)
+    status      UserStatus @default(TRIAL)
+    createdAt   DateTime   @default(now()) @map("created_at")
+    updatedAt   DateTime   @updatedAt @map("updated_at")
+    lastLoginIp String?    @map("last_login_ip")
+    lastLoginAt DateTime?  @map("last_login_at")
+
+    accounts           Account[]
+    sessions           Session[]
+    orders             Order[] // User's purchase orders
+    invoices           Invoice[] // User's invoices
+    creditTransactions CreditTransaction[] // History of credit changes
+    aiGenerations      AiGenerationRequest[] // History of AI generations
+
+    @@map("users")
 }
 
 model VerificationToken {
@@ -58,4 +110,84 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+    @@map("verification_tokens")
+}
+
+model CreditTransaction {
+    id          String                @id @default(cuid())
+    userId      String                @map("user_id")
+    user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+    amount      Int
+    type        CreditTransactionType
+    description String?
+    createdAt   DateTime              @default(now()) @map("created_at")
+
+    orderId String? @map("order_id")
+    order   Order?  @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+    generationId String?              @map("generation_id")
+    generation   AiGenerationRequest? @relation(fields: [generationId], references: [id], onDelete: SetNull)
+
+    @@index([userId])
+    @@index([orderId])
+    @@index([generationId])
+    @@map("credit_transactions")
+}
+
+model Order {
+    id               String          @id @default(cuid())
+    userId           String          @map("user_id")
+    user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+    status           OrderStatus     @default(PENDING)
+    amount           Decimal
+    currency         String
+    creditsPurchased Int             @map("credits_purchased")
+    paymentProvider  PaymentProvider @map("payment_provider")
+    providerOrderId  String?         @unique @map("provider_order_id")
+    createdAt        DateTime        @default(now()) @map("created_at")
+    updatedAt        DateTime        @updatedAt @map("updated_at")
+
+    invoice            Invoice? // Link to the final invoice (usually one-to-one with successful order)
+    creditTransactions CreditTransaction[]
+
+    @@index([userId])
+    @@map("orders")
+}
+
+model Invoice {
+    id                String    @id @default(cuid())
+    orderId           String    @unique @map("order_id")
+    order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    userId            String    @map("user_id")
+    user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    providerInvoiceId String?   @unique @map("provider_invoice_id")
+    status            String
+    amountPaid        Decimal   @map("amount_paid")
+    currency          String
+    paidAt            DateTime? @map("paid_at")
+    invoiceUrl        String?   @map("invoice_url")
+    createdAt         DateTime  @default(now()) @map("created_at")
+    updatedAt         DateTime  @updatedAt @map("updated_at")
+
+    @@index([userId])
+    @@index([orderId])
+    @@map("invoices")
+}
+
+model AiGenerationRequest {
+    id            String             @id @default(cuid())
+    userId        String             @map("user_id")
+    user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+    prompt        String             @db.Text
+    creditsCost   Int                @map("credits_cost")
+    status        AiGenerationStatus @default(PENDING)
+    resultSvgPath String?            @map("result_svg_path")
+    errorMessage  String?            @map("error_message")
+    createdAt     DateTime           @default(now()) @map("created_at")
+    completedAt   DateTime?          @map("completed_at")
+
+    creditTransactions CreditTransaction[]
+
+    @@index([userId])
+    @@map("ai_generation_requests")
 }

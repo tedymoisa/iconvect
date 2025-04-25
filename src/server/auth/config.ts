@@ -1,8 +1,12 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
+import { type Adapter } from "next-auth/adapters";
 import GitHub from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
 import { db } from "@/server/db";
+import { type UserStatus } from "@prisma/client";
+import { env } from "@/env";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -14,15 +18,19 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      credits: number;
+      status: UserStatus;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    credits: number;
+    status: UserStatus;
+    // ...other properties
+    // role: UserRole;
+  }
 }
 
 /**
@@ -32,7 +40,14 @@ declare module "next-auth" {
  */
 export const authConfig = {
   providers: [
-    GitHub
+    GitHub({
+      clientId: env.AUTH_GITHUB_ID,
+      clientSecret: env.AUTH_GITHUB_SECRET
+    }),
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET
+    })
     /**
      * ...add more providers here.
      *
@@ -43,13 +58,15 @@ export const authConfig = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
-  adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(db) as Adapter,
   callbacks: {
     session: ({ session, user }) => ({
       ...session,
       user: {
         ...session.user,
-        id: user.id
+        id: user.id,
+        credits: user.credits,
+        status: user.status
       }
     })
   }

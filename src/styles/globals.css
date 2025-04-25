@@ -1,3 +1,69 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    /* Enable font smoothing */
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+}
+
+@layer base {
+  /* --- Light Theme Fallbacks (:root) --- */
+  /* Define the actual theme variables using HSL values */
+  :root {
+    --background: 255 100% 100%; /* White */
+    --foreground: 240 6.5% 9%; /* zinc-950 */
+    --card: 255 100% 100%;
+    --card-foreground: 240 6.5% 9%; /* zinc-950 */
+    --popover: 255 100% 100%;
+    --popover-foreground: 240 6.5% 9%; /* zinc-950 */
+    --primary: 263.4 70% 50.4%; /* purple-600 */
+    --primary-foreground: 240 5.9% 95%; /* zinc-50 */
+    --secondary: 240 5.2% 90%; /* zinc-100 */
+    --secondary-foreground: 240 6% 12%; /* zinc-900 */
+    --muted: 240 5.2% 90%; /* zinc-100 */
+    --muted-foreground: 240 5% 50%; /* zinc-500 */
+    --accent: 240 5.2% 90%; /* zinc-100 */
+    --accent-foreground: 240 6% 12%; /* zinc-900 */
+    --destructive: 0 72.2% 50.6%; /* red-500 */
+    --destructive-foreground: 240 5.9% 95%; /* zinc-50 */
+    --border: 240 5% 85%; /* zinc-200 */
+    --input: 240 5% 85%; /* zinc-200 */
+    --ring: 262 80% 76.9%; /* purple-400 */
+
+    --radius: 0.5rem;
+  }
+
+  /* --- Dark Theme (.dark) --- */
+  /* Override the theme variables for dark mode */
+  .dark {
+    --background: 240 6.5% 9%; /* zinc-950 */
+    --foreground: 240 5% 85%; /* zinc-200 */
+    --card: 240 6% 12%; /* zinc-900 */
+    --card-foreground: 240 5% 85%; /* zinc-200 */
+    --popover: 240 5.6% 20%; /* zinc-800 */
+    --popover-foreground: 240 5% 85%; /* zinc-200 */
+    --primary: 262.1 83.3% 57.8%; /* purple-500 */
+    --primary-foreground: 240 5.9% 95%; /* zinc-50 */
+    --secondary: 240 5.6% 20%; /* zinc-800 */
+    --secondary-foreground: 240 4.9% 75%; /* zinc-300 */
+    --muted: 240 5.6% 20%; /* zinc-800 */
+    --muted-foreground: 240 4.8% 65%; /* zinc-400 */
+    --accent: 240 5.6% 20%; /* zinc-800 */
+    --accent-foreground: 240 5% 85%; /* zinc-200 */
+    --destructive: 0 62.8% 44.5%; /* red-600 */
+    --destructive-foreground: 240 5.9% 95%; /* zinc-50 */
+    --border: 240 5.3% 30%; /* zinc-700 */
+    --input: 240 5.6% 20%; /* zinc-800 */
+    --ring: 262 80% 76.9%; /* purple-400 */
+  }
+}

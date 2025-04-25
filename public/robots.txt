@@ -1,0 +1,13 @@
+# robots.txt for IconVect
+
+User-agent: *
+Allow: /
+
+# Disallow crawling of API routes
+Disallow: /api/
+
+# Disallow crawling of Next.js internal folders (optional but good practice)
+Disallow: /_next/
+
+# Point crawlers to the sitemap
+Sitemap: https://iconvect.com/sitemap.xml
