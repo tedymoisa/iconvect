@@ -9,8 +9,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "./ui/dropdown-menu";
-import { Session } from "next-auth";
+import { type Session } from "next-auth";
 import { signOut } from "next-auth/react";
+import Image from "next/image";
 
 export default function UserProfileMenu({ session }: { session: Session }) {
   const handleSignOut = async () => {
@@ -21,7 +22,14 @@ export default function UserProfileMenu({ session }: { session: Session }) {
     <DropdownMenu>
       <DropdownMenuTrigger className="cursor-pointer" asChild>
         {session?.user.image ? (
-          <img src={session.user.image} className="h-8 w-8 rounded-full" />
+          <div className="relative size-8">
+            <Image
+              src={session.user.image}
+              fill={true}
+              alt={`${session?.user.name ?? "User"}'s profile picture`}
+              className="rounded-full"
+            />
+          </div>
         ) : (
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
             <span className="text-l font-bold text-primary">{session?.user.name?.charAt(0).toUpperCase()}</span>
