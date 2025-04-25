@@ -85,7 +85,7 @@
     "@stripe/stripe-js": "^7.2.0",
     "@tailwindcss/postcss": "^4.1.4",
     "@types/eslint": "^8.56.12",
-    "@types/node": "^20.17.31",
+    "@types/node": "^22.15.2",
     "@types/react": "^18.3.20",
     "@types/react-dom": "^18.3.6",
     "@types/react-syntax-highlighter": "^15.5.13",
