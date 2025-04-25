@@ -58,6 +58,7 @@ export const authConfig = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
+  // eslint-disable-next-line
   adapter: PrismaAdapter(db) as Adapter,
   callbacks: {
     session: ({ session, user }) => ({
