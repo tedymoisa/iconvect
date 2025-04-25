@@ -5,7 +5,7 @@ import { siteConfig } from "@/site-config";
 
 export default function HomePage() {
   return (
-    <main className="relative mx-auto max-w-5xl px-4 pb-20 pt-16 md:pb-24 md:pt-20">
+    <main className="relative mx-auto max-w-5xl px-4 pt-16 pb-20 md:pt-20 md:pb-24">
       <div
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 flex h-full justify-center overflow-hidden opacity-30 blur-3xl" // <-- Add h-screen and pointer-events-none
       >
@@ -23,12 +23,12 @@ export default function HomePage() {
         <div className="mb-6 inline-flex flex-col items-center gap-y-3 md:mb-8 md:flex-row md:gap-x-4">
           <Logo className="h-10 w-auto shrink-0 text-purple-400 md:h-12" />
 
-          <h1 className="bg-gradient-to-br from-purple-400 to-purple-600 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent md:text-6xl lg:text-7xl">
+          <h1 className="bg-linear-to-br from-purple-400 to-purple-600 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent md:text-6xl lg:text-7xl">
             {siteConfig.name}
           </h1>
         </div>
 
-        <p className="mx-auto max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+        <p className="text-muted-foreground mx-auto max-w-3xl text-lg leading-relaxed md:text-xl">
           Transform your ideas into beautiful vector graphics with the power of AI. Leverage cutting-edge models to
           generate unique, scalable artwork instantly.
         </p>

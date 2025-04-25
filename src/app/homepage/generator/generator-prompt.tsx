@@ -39,7 +39,7 @@ export default function GeneratorPrompt() {
       <div className="mb-5">
         <Textarea
           placeholder="e.g., A pencil that represents editing"
-          className="min-h-[120px] resize-none border-border text-base transition-colors duration-200 ease-in-out focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40" // Keep ring but make border primary on focus
+          className="border-border focus-visible:border-primary focus-visible:ring-ring/40 min-h-[120px] resize-none text-base transition-colors duration-200 ease-in-out focus-visible:ring-2 focus-visible:outline-hidden" // Keep ring but make border primary on focus
           value={prompt}
           onChange={(event) => setPrompt(event.target.value)}
           aria-label="SVG generation prompt"
