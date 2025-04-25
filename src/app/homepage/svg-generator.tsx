@@ -4,7 +4,7 @@ import GeneratorPrompt from "./generator/generator-prompt";
 
 export default function SvgGenerator() {
   return (
-    <Card className="bg-card relative overflow-hidden border border-border shadow-lg shadow-purple-950/20">
+    <Card className="relative overflow-hidden border border-border bg-card shadow-lg shadow-purple-950/20">
       <div className="absolute left-0 top-0 h-1 w-full bg-primary"></div>
 
       <CardHeader className="relative flex flex-row items-start gap-x-4 space-y-0 border-b border-border pb-6 pt-8">
@@ -15,7 +15,7 @@ export default function SvgGenerator() {
           <CardTitle className="bg-gradient-to-br from-purple-400 to-purple-600 bg-clip-text text-xl font-semibold tracking-tight text-transparent md:text-2xl">
             What can I generate for you?
           </CardTitle>
-          <p className="text-muted-foreground mt-1 text-base">
+          <p className="mt-1 text-base text-muted-foreground">
             Describe the vector graphic you want to generate using natural language.
           </p>
         </div>

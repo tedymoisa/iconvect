@@ -20,7 +20,7 @@ export default function PurchaseNowButton({ price }: { price: Stripe.Price }) {
       className={`flex w-full justify-center rounded-md px-4 py-2 font-medium transition-colors ${
         isPopular
           ? "bg-primary text-primary-foreground hover:bg-primary/90"
-          : "bg-slate-100 text-foreground hover:bg-slate-200 dark:bg-slate-800 dark:text-foreground_dark dark:hover:bg-slate-700"
+          : "dark:text-foreground_dark bg-slate-100 text-foreground hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700"
       }`}
     >
       {isPending ? <Loader /> : "Purchase Now"}
