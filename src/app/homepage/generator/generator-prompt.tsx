@@ -16,18 +16,21 @@ export default function GeneratorPrompt() {
   const [prompt, setPrompt] = useState("");
   const { setIsOpen } = useDialogStore();
 
-  const { mutate, isPending } = api.post.generate.useMutation();
+  const { mutate, isPending } = api.gemini.generate.useMutation();
 
   const handleGenerate = () => {
     if (session) {
       if (prompt.length >= 0) {
-        mutate(undefined, {
-          onSuccess: (data) => {
-            setGeneratedSvg(data.svg);
+        mutate(
+          { prompt },
+          {
+            onSuccess: (data) => {
+              setGeneratedSvg(data);
 
-            scrollPage(300, 1000);
+              scrollPage(300, 1000);
+            }
           }
-        });
+        );
       }
     } else {
       setIsOpen(true);

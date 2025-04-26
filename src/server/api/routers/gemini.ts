@@ -1,20 +1,19 @@
-import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { z } from "zod";
-import { geminiClient } from "@/server/gemini";
 import { env } from "@/env";
-import { TRPCError } from "@trpc/server";
+import { MOCK_SVG } from "@/lib/constants";
 import { extractAndSanitizeSvg } from "@/lib/utils";
+import { geminiClient } from "@/server/gemini";
+import { type GenerationConfig, HarmBlockThreshold, HarmCategory } from "@google/genai";
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 const defaultModel = "gemini-1.5-flash-latest";
 const systemInstruction = `
-Act as an SVG code generator.
-Strict rules:
-1. Root <svg> MUST have: xmlns='http://www.w3.org/2000/svg' and viewBox='0 0 24 24'.
-2. Default style for elements: fill='currentColor', stroke-width='1'. Apply unless prompt specifies otherwise.
-3. Design: Complex and iconic but visually clear. Define and separate shapes effectively using thin strokes or white spaces.
-4. Output ONLY raw SVG code, starting with <svg> and ending with </svg>. Keep the svg code simple but efficient.
-5. NO other text, explanations, or comments outside the code block.
+Act as an SVG code generator. Strict rules to be followed:
+1. Default style for elements: xmlns='http://www.w3.org/2000/svg', viewBox='0 0 24 24', fill='currentColor', stroke-width='1'. Apply unless prompt specifies otherwise.
+2. Design: Complex and iconic but visually clear. Define and separate shapes effectively using thin strokes or white spaces.
+3. Output ONLY raw SVG code, starting precisely with '<svg>' and ending precisely with '</svg>'.
+4. Don't add comments or explanations inside the output. The entire response must be only the SVG code itself.
 `;
 const safetySettings = [
   { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
@@ -22,10 +21,9 @@ const safetySettings = [
   { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
   { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE }
 ];
-const generationConfig = {
+const generationConfig: GenerationConfig = {
   temperature: 0.4,
-  topK: 32,
-  topP: 1,
+  topP: 0.95,
   maxOutputTokens: 8192,
   responseMimeType: "text/plain"
 };
@@ -43,21 +41,34 @@ export const geminiRouter = createTRPCRouter({
       const { prompt } = input;
 
       console.log(`User ${userId} generating SVG with prompt: "${prompt}"`);
+      if (env.NODE_ENV === "development") {
+        return MOCK_SVG;
+      }
 
       try {
-        const model = geminiClient.getGenerativeModel({
+        const result = await geminiClient.models.generateContent({
           model: env.GOOGLE_GEMINI_MODEL ?? defaultModel,
-          systemInstruction: { role: "system", parts: [{ text: systemInstruction }] },
-          generationConfig,
-          safetySettings
+          contents: {
+            role: "user",
+            parts: [
+              {
+                text: prompt
+              }
+            ]
+          },
+          config: {
+            systemInstruction: [{ text: systemInstruction }],
+            thinkingConfig: {
+              includeThoughts: false
+            },
+            ...generationConfig,
+            ...safetySettings
+          }
         });
 
-        const result = await model.generateContent(prompt);
-        const response = result.response;
-
-        const candidate = response?.candidates?.[0];
+        const candidate = result.candidates?.[0];
         if (!candidate) {
-          console.error("Gemini Error: No candidates found in response.", response);
+          console.error("Gemini Error: No candidates found in response.", result);
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR", // Or UNPROCESSABLE_CONTENT
             message: "Failed to generate SVG: No response from AI model."
