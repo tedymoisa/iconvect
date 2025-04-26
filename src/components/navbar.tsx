@@ -9,11 +9,9 @@ import { Button } from "./ui/button";
 import UserProfileIcon from "./user-profile-menu";
 
 export default function Navbar() {
-  const { data: session } = useSession();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isCursorAtTop, setIsCursorAtTop] = useState(false);
-  const { setIsOpen } = useDialogStore();
 
   useEffect(() => {
     const scrollHideThreshold = 50;
@@ -78,17 +76,39 @@ export default function Navbar() {
             </span>
           </div>
 
-          <div className="flex items-center gap-x-4">
-            {session && (
-              <div className="border-border/50 bg-muted/50 hidden rounded-md border px-3 py-1 text-sm md:block">
-                <span className="text-muted-foreground/80 mr-1.5">Credits:</span>
-                <span className="text-primary font-medium">{session.user.credits}</span>
-              </div>
-            )}
-            {session ? <UserProfileIcon session={session} /> : <Button onClick={() => setIsOpen(true)}>Login</Button>}
-          </div>
+          <NavbarLeftSide />
         </div>
       </div>
     </nav>
+  );
+}
+
+function NavbarLeftSide() {
+  const { data: session, status } = useSession();
+  const { setIsOpen } = useDialogStore();
+
+  if (status === "loading") {
+    return undefined;
+  }
+
+  if (status === "authenticated" && session?.user) {
+    const user = session.user;
+
+    return (
+      <div className="flex items-center gap-x-4">
+        <div className="border-border/50 bg-muted/50 hidden rounded-md border px-3 py-1 text-sm md:block">
+          <span className="text-muted-foreground/80 mr-1.5">Credits:</span>
+          <span className="text-primary font-medium">{user.credits ?? "N/A"}</span>
+        </div>
+
+        <UserProfileIcon session={session} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-x-4">
+      <Button onClick={() => setIsOpen(true)}>Login</Button>
+    </div>
   );
 }
