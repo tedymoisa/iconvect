@@ -2,11 +2,11 @@ import { stripeClient } from "@/server/stripe";
 import { TRPCError } from "@trpc/server";
 import Stripe from "stripe";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { apiUrl } from "@/lib/constants";
 
 export const stripeRouter = createTRPCRouter({
-  prices: protectedProcedure.output(z.array(z.custom<Stripe.Price>())).query(async () => {
+  prices: publicProcedure.output(z.array(z.custom<Stripe.Price>())).query(async () => {
     try {
       const prices = await stripeClient.prices.list({
         active: true,
