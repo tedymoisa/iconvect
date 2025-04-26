@@ -1,0 +1,101 @@
+version: 2
+updates:
+  # === NPM / PNPM Dependencies (Main Application) ===
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "04:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "tedymoisa"
+      - "kevinagyeman"
+    assignees:
+      - "tedymoisa"
+    labels:
+      - "dependencies"
+      - "dependabot"
+
+    # --- IMPORTANT: Ignore Major Updates ---
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+    groups:
+      # React & Next.js related packages
+      react-next-stack:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "next"
+          - "eslint-config-next"
+          - "next-auth"
+          - "next-themes"
+          - "@t3-oss/env-nextjs"
+          - "geist"
+      # tRPC stack
+      trpc-stack:
+        patterns:
+          - "@trpc/*"
+          - "superjson"
+          - "zod"
+      # Prisma ORM and adapter
+      prisma-stack:
+        patterns:
+          - "prisma"
+          - "@prisma/client"
+          - "@auth/prisma-adapter"
+      # UI components & styling (Tailwind, Radix, etc.)
+      ui-styling:
+        patterns:
+          - "tailwindcss"
+          - "tailwindcss-*"
+          - "tailwind-merge"
+          - "clsx"
+          - "lucide-react"
+          - "@radix-ui/*"
+          - "class-variance-authority"
+          - "@tailwindcss/postcss"
+          - "postcss"
+          - "prettier-plugin-tailwindcss"
+      # Linting, formatting, and TypeScript tooling
+      dev-tooling:
+        patterns:
+          - "eslint"
+          - "@eslint/*"
+          - "@typescript-eslint/*"
+          - "typescript"
+          - "prettier"
+          - "@types/*"
+      # Stripe related packages
+      stripe-stack:
+        patterns:
+          - "stripe"
+          - "@stripe/*"
+      # AI / Content related packages
+      ai-content:
+        patterns:
+          - "@google/generative-ai"
+          - "openai"
+          - "dompurify"
+          - "html-react-parser"
+          - "react-syntax-highlighter"
+      # State, Query, and Fetching
+      state-query-fetching:
+        patterns:
+          - "@tanstack/react-query"
+          - "zustand"
+          - "axios"
+          - "posthog-js"
+
+  # === GitHub Actions ===
+  # Keep your CI/CD workflows up-to-date
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "github_actions"
+      - "dependabot"
