@@ -55,8 +55,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <Navbar />
             {children}
-            <AuthModal />
             <Footer />
+            <AuthModal />
           </ThemeProvider>
         </Providers>
       </body>
