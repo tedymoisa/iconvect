@@ -19,7 +19,6 @@ export default function GeneratorPrompt() {
   const { setIsOpen } = useDialogStore();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const controller = new AbortController();
 
   const { mutate, isPending } = api.gemini.generate.useMutation();
 
@@ -73,12 +72,16 @@ export default function GeneratorPrompt() {
 
   if (isPending) {
     return (
-      <div className="flex items-center justify-between gap-4">
-        <SvgLoading />
-        <Button variant="outline" size="sm" onClick={() => controller.abort()}>
-          <X className="h-4 w-4" />
-          Cancel
-        </Button>
+      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+        <div className="w-full">
+          <SvgLoading />
+        </div>
+        <div className="mx-auto sm:mx-0">
+          <Button variant="ghost" size="sm" onClick={() => window.location.reload()}>
+            <X className="h-4 w-4" />
+            Cancel
+          </Button>
+        </div>
       </div>
     );
   } else {

@@ -17,7 +17,7 @@ export function LoadingText({ text, dots }: LoadingTextProps) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.3 }}
-          className="w-full text-lg font-medium"
+          className="text-muted-foreground w-full text-sm font-medium"
         >
           {text}
           {dots}
@@ -55,15 +55,17 @@ export function TextLoader({ messages, interval = 2000, dotCount = 3, direction 
   if (direction === "horizontal") {
     return (
       <div className="flex w-full items-center justify-start gap-3 rounded-sm px-3 py-2">
-        <motion.div
-          className="text-primary-foreground size-5 rounded-full border-[3px] border-t-transparent md:size-6"
-          animate={{ rotate: 360 }}
-          transition={{
-            duration: 1,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "linear"
-          }}
-        />
+        <div className="min-w-[20px]">
+          <motion.div
+            className="text-primary-foreground size-5 rounded-full border-[3px] border-t-transparent md:size-6"
+            animate={{ rotate: 360 }}
+            transition={{
+              duration: 1,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "linear"
+            }}
+          />
+        </div>
         {messages[currentIndex] && <LoadingText text={messages[currentIndex]} dots={dots} />}
       </div>
     );
