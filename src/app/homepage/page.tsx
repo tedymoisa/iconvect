@@ -1,40 +1,38 @@
-import Logo from "@/components/logo";
+import { BlurIn } from "./blur-in";
 import SvgPreview from "./generator/svg-preview";
+import { Heading } from "./heading";
 import SvgGenerator from "./svg-generator";
-import { siteConfig } from "@/site-config";
 
 export default function HomePage() {
   return (
-    <main className="relative mx-auto max-w-5xl px-4 pt-16 pb-20 md:pt-20 md:pb-24">
+    <div className="size-full bg-[url(/svg/ellipsis-dark.svg)] bg-[length:30px_30px] bg-repeat dark:bg-[url(/svg/ellipsis-light.svg)]">
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 flex h-full justify-center overflow-hidden opacity-30 blur-3xl" // <-- Add h-screen and pointer-events-none
+        className={
+          "size-full bg-gradient-to-tr from-zinc-50/90 via-zinc-50/40 to-zinc-50/10 dark:from-zinc-950/90 dark:via-zinc-950/40 dark:to-zinc-950/10"
+        }
       >
-        <svg viewBox="0 0 1024 1024" className="h-[64rem] w-[64rem] flex-none">
-          <defs>
-            <radialGradient id="radial-gradient-header" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-              <stop offset="0%" stopColor="hsl(var(--primary) / 0.4)" />
-              <stop offset="100%" stopColor="hsl(var(--primary) / 0)" />
-            </radialGradient>
-          </defs>
-          <rect width="1024" height="1024" fill="url(#radial-gradient-header)"></rect>
-        </svg>
+        <main className="mx-auto flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-4">
+          <BlurIn>
+            <div className={"bg-secondary mx-auto w-fit rounded-xl border p-1 px-3 text-sm"}>
+              Already used by 5 milion people
+            </div>
+            <div className="mt-5 flex max-w-3xl flex-col items-center">
+              <Heading text="Your Projects, Your Icons" />
+              <p className="text-muted-foreground md:text-l mt-5 text-center text-base sm:text-lg">
+                Generate stunning, unique vector icons instantly using the power of Al. Create scalable SVG assets for
+                your projects in seconds.
+              </p>
+              <div className="mt-12 w-full">
+                <p className="text-muted-foreground mb-4 text-center text-base font-semibold sm:text-lg md:text-xl">
+                  What do you want to create?
+                </p>
+                <SvgGenerator />
+                <SvgPreview />
+              </div>
+            </div>
+          </BlurIn>
+        </main>
       </div>
-      <header className="relative z-10 mb-20 text-center md:mb-24">
-        <div className="mb-6 inline-flex flex-col items-center gap-y-3 md:mb-8 md:flex-row md:gap-x-4">
-          <Logo className="h-10 w-auto shrink-0 text-purple-400 md:h-12" />
-
-          <h1 className="bg-linear-to-br from-purple-400 to-purple-600 bg-clip-text text-5xl font-extrabold tracking-tight text-transparent md:text-6xl lg:text-7xl">
-            {siteConfig.name}
-          </h1>
-        </div>
-
-        <p className="text-muted-foreground mx-auto max-w-3xl text-lg leading-relaxed md:text-xl">
-          Transform your ideas into beautiful vector graphics with the power of AI. Leverage cutting-edge models to
-          generate unique, scalable artwork instantly.
-        </p>
-      </header>
-      <SvgGenerator />
-      <SvgPreview />
-    </main>
+    </div>
   );
 }
