@@ -1,17 +1,10 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "./ui/dropdown-menu";
 import { type Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 export default function UserProfileMenu({ session }: { session: Session }) {
   const handleSignOut = async () => {
@@ -37,15 +30,6 @@ export default function UserProfileMenu({ session }: { session: Session }) {
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {/*// TODO: Add settings and credit management */}
-
-        {/* <DropdownMenuItem>
-          <User />
-          <span>Profile</span>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator /> */}
         <DropdownMenuItem className="cursor-pointer" onClick={() => handleSignOut()}>
           <LogOut />
           <span>Log out</span>

@@ -1,28 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles } from "lucide-react";
 import GeneratorPrompt from "./generator/generator-prompt";
 
 export default function SvgGenerator() {
   return (
-    <Card className="border-border bg-card relative overflow-hidden border shadow-lg shadow-purple-950/20">
-      <div className="bg-primary absolute top-0 left-0 h-1 w-full"></div>
-
-      <CardHeader className="border-border relative flex flex-row items-start space-y-0 gap-x-4 border-b pt-8 pb-6">
-        <div className="bg-primary/10 mt-1 shrink-0 rounded-full p-2">
-          <Sparkles className="h-5 w-5 text-purple-400" />
+    <div className="bg-primary/10 rounded-[36px] p-[8px]">
+      <div className="from-card/70 to-secondary/50 w-full rounded-[28px] border border-white/50 bg-gradient-to-b text-neutral-500 dark:border-neutral-700/50">
+        <div className="px-6 py-4">
+          <GeneratorPrompt />
         </div>
-        <div className="grow">
-          <CardTitle className="bg-linear-to-br from-purple-400 to-purple-600 bg-clip-text text-xl font-semibold tracking-tight text-transparent md:text-2xl">
-            What can I generate for you?
-          </CardTitle>
-          <p className="text-muted-foreground mt-1 text-base">
-            Describe the vector graphic you want to generate using natural language.
-          </p>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-6">
-        <GeneratorPrompt />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

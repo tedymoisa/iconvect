@@ -1,12 +1,14 @@
 import Navbar from "@/components/navbar";
 import "@/styles/globals.css";
 
+import AuthModal from "@/components/auth-dialog";
+import Footer from "@/components/footer";
+import { ThemeProvider } from "@/components/theme-provider";
+import { JsonLdWebsite } from "@/json-ld-website";
+import { siteConfig } from "@/site-config";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import Providers from "./providers";
-import AuthModal from "@/components/auth-dialog";
-import { siteConfig } from "@/site-config";
-import { JsonLdWebsite } from "@/json-ld-website";
 
 export const metadata: Metadata = {
   title: siteConfig.name,
@@ -50,9 +52,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body className="relative">
         <Providers>
-          <Navbar />
-          <div className="pt-24">{children}</div>
-          <AuthModal />
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <Navbar />
+            {children}
+            <AuthModal />
+            <Footer />
+          </ThemeProvider>
         </Providers>
       </body>
     </html>
