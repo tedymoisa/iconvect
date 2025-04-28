@@ -8,7 +8,7 @@ export function Heading({ text }: { text: string }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
   return (
-    <h2
+    <h1
       ref={ref}
       className="text-primary text-center text-3xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
     >
@@ -22,6 +22,6 @@ export function Heading({ text }: { text: string }) {
           {letter}
         </motion.span>
       ))}
-    </h2>
+    </h1>
   );
 }

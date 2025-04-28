@@ -85,7 +85,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
         <Link href="/">
           <div className="flex items-center gap-x-4">
-            <Logo className="text-primary h-10 w-auto" />
+            <Logo />
             <span className="text-2xl font-extrabold tracking-tight">IconVect</span>
           </div>
         </Link>
