@@ -9,7 +9,7 @@ export default function AuthModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent>
+      <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>Login</DialogTitle>
           <DialogDescription>Login with your Github or Google account to generate something</DialogDescription>

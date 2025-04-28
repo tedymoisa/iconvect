@@ -13,9 +13,7 @@ export default function HomePage() {
       >
         <main className="mx-auto flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-4">
           <BlurIn>
-            <div className={"bg-secondary mx-auto w-fit rounded-xl border p-1 px-3 text-sm"}>
-              Already used by 5 milion people
-            </div>
+            <div className={"bg-secondary mx-auto w-fit rounded-xl border p-1 px-3 text-sm"}>Release v1.0.0</div>
             <div className="mt-5 flex max-w-3xl flex-col items-center">
               <Heading text="Your Projects, Your Icons" />
               <p className="text-muted-foreground md:text-l mt-5 text-center text-base sm:text-lg">

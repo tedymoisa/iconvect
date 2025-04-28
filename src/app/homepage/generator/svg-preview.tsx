@@ -73,7 +73,7 @@ function CodeTab({ svg }: { svg: string }) {
           variant="ghost"
           size="icon"
           onClick={copyToClipboard}
-          className="text-muted-foreground/70 hover:text-muted-foreground top-2 right-5 size-8 cursor-pointer transition-colors"
+          className="text-muted-foreground/70 hover:text-muted-foreground top-2 right-5 size-8 transition-colors"
           aria-label="Copy SVG code"
         >
           {copied ? <Check className="size-4" /> : <Copy className="size-4" />}

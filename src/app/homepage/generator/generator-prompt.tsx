@@ -6,10 +6,11 @@ import { cn, scrollPage } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
 import { useSvgStore } from "@/store/svg";
 import { api } from "@/trpc/react";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
+import SvgLoading from "./svg-loading";
 
 export default function GeneratorPrompt() {
   const { data: session } = useSession();
@@ -18,6 +19,7 @@ export default function GeneratorPrompt() {
   const { setIsOpen } = useDialogStore();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const controller = new AbortController();
 
   const { mutate, isPending } = api.gemini.generate.useMutation();
 
@@ -69,41 +71,52 @@ export default function GeneratorPrompt() {
     }
   }, [prompt]);
 
-  return (
-    <form ref={formRef} onSubmit={handleGenerate} className="flex flex-col gap-4 sm:flex-row">
-      <Textarea
-        ref={textareaRef}
-        placeholder="e.g., A pencil that represents editing"
-        className="w-full resize-none border-none shadow-none outline-none focus:border-none focus:ring-0 focus:outline-none focus-visible:border-none focus-visible:ring-0 focus-visible:outline-none"
-        value={prompt}
-        rows={1}
-        aria-label="SVG generation prompt"
-        style={{ maxHeight: "calc(1.5em * 10)", overflowY: "auto" }}
-        onChange={(event) => setPrompt(event.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-      <Button
-        type="submit"
-        disabled={isPending || !prompt.trim()}
-        size="lg"
-        className={cn(
-          "mx-auto w-fit animate-[bg-shine_3s_linear_infinite] rounded-lg border-[1px] bg-[length:200%_100%] tracking-wide shadow",
-          "bg-[linear-gradient(110deg,var(--primary),45%,#E4E4E7,55%,var(--primary))]",
-          "cursor-pointer"
-        )}
-      >
-        {isPending ? (
-          <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            <span>Generating...</span>
-          </>
-        ) : (
-          <>
-            <Sparkles className="mr-2 h-5 w-5" />
-            <span>Generate</span>
-          </>
-        )}
-      </Button>
-    </form>
-  );
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-between gap-4">
+        <SvgLoading />
+        <Button variant="outline" size="sm" onClick={() => controller.abort()}>
+          <X className="h-4 w-4" />
+          Cancel
+        </Button>
+      </div>
+    );
+  } else {
+    return (
+      <form ref={formRef} onSubmit={handleGenerate} className="flex flex-col gap-4 sm:flex-row">
+        <Textarea
+          ref={textareaRef}
+          placeholder="e.g., A pencil that represents editing"
+          className="w-full resize-none border-none shadow-none outline-none focus:border-none focus:ring-0 focus:outline-none focus-visible:border-none focus-visible:ring-0 focus-visible:outline-none"
+          value={prompt}
+          rows={1}
+          aria-label="SVG generation prompt"
+          style={{ maxHeight: "calc(1.5em * 10)", overflowY: "auto" }}
+          onChange={(event) => setPrompt(event.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        <Button
+          type="submit"
+          disabled={isPending || !prompt.trim()}
+          size="lg"
+          className={cn(
+            "mx-auto w-fit animate-[bg-shine_3s_linear_infinite] rounded-lg border-[1px] bg-[length:200%_100%] tracking-wide shadow",
+            "bg-[linear-gradient(110deg,var(--primary),45%,#E4E4E7,55%,var(--primary))]"
+          )}
+        >
+          {isPending ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              <span>Generating...</span>
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-5 w-5" />
+              <span>Generate</span>
+            </>
+          )}
+        </Button>
+      </form>
+    );
+  }
 }
