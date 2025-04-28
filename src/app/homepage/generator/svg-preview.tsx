@@ -30,10 +30,10 @@ export default function SvgPreview() {
             </TabsList>
           </div>
 
-          <TabsContent value="preview" className="flex items-center justify-center">
+          <TabsContent value="preview">
             <PreviewTab svg={generatedSvg} />
           </TabsContent>
-          <TabsContent value="code">
+          <TabsContent value="code" className="max-w-screen px-4">
             <CodeTab svg={generatedSvg} />
           </TabsContent>
         </Tabs>
@@ -67,7 +67,7 @@ function CodeTab({ svg }: { svg: string }) {
 
   return (
     <div className="rounded-xs border">
-      <div className="bg-accent flex items-center justify-between px-2">
+      <div className="bg-accent flex items-center justify-between px-4">
         <code>svg</code>
         <Button
           variant="ghost"
@@ -79,21 +79,18 @@ function CodeTab({ svg }: { svg: string }) {
           {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
         </Button>
       </div>
-      <div className="overflow-hidde relative">
-        <SyntaxHighlighter
-          language="xml"
-          style={theme === "light" ? atomOneLight : gradientDark}
-          customStyle={{
-            fontSize: "15px",
-            maxHeight: "18rem",
-            padding: "1rem",
-            overflow: "auto",
-            background: "var(--card)"
-          }}
-        >
-          {svg}
-        </SyntaxHighlighter>
-      </div>
+      <SyntaxHighlighter
+        language="xml"
+        style={theme === "light" ? atomOneLight : gradientDark}
+        customStyle={{
+          fontSize: "15px",
+          maxHeight: "18rem",
+          padding: "1rem",
+          background: "var(--card)"
+        }}
+      >
+        {svg}
+      </SyntaxHighlighter>
     </div>
   );
 }
