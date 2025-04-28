@@ -12,13 +12,21 @@ import ThemeChanger from "./theme-changer";
 import { Button } from "./ui/button";
 import UserProfileIcon from "./user-profile-menu";
 
+const navigation = [
+  {
+    name: "Homepage",
+    href: "/"
+  },
+  {
+    name: "Prices",
+    href: "/prices"
+  }
+];
+
 export default function Navbar() {
-  const { data: session } = useSession();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isCursorAtTop, setIsCursorAtTop] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { setIsOpen } = useDialogStore();
 
   useEffect(() => {
     const scrollHideThreshold = 50;
@@ -67,115 +75,108 @@ export default function Navbar() {
     };
   }, [lastScrollY, isCursorAtTop]);
 
-  useEffect(() => {
-    if (!mobileMenuOpen) return;
-    const handleRouteChange = () => setMobileMenuOpen(false);
-    window.addEventListener("hashchange", handleRouteChange);
-    window.addEventListener("popstate", handleRouteChange);
-    return () => {
-      window.removeEventListener("hashchange", handleRouteChange);
-      window.removeEventListener("popstate", handleRouteChange);
-    };
-  }, [mobileMenuOpen]);
-
-  const navigation = [
-    {
-      name: "Homepage",
-      href: "/"
-    },
-    {
-      name: "Prices",
-      href: "/prices"
-    }
-  ];
-
   return (
-    <>
-      <nav
-        className={cn(
-          "bg-background fixed top-0 left-0 z-50 w-full transition-transform duration-300 ease-in-out",
-          isVisible ? "translate-y-0" : "-translate-y-full"
-        )}
-      >
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
-          <Link href="/">
-            <div className="flex items-center gap-x-4">
-              <Logo className="text-primary h-10 w-auto" />
-              <span className="text-2xl font-extrabold tracking-tight">IconVect</span>
-            </div>
-          </Link>
-
-          {/* Desktop navigation */}
-          <div className="hidden items-center gap-x-4 md:flex">
-            <ThemeChanger />
-            {navigation.map((item) => (
-              <Button key={item.name} asChild variant={"ghost"}>
-                <Link href={item.href}>{item.name}</Link>
-              </Button>
-            ))}
-            {session && <Credits session={session} />}
-            {session ? <UserProfileIcon session={session} /> : <Button onClick={() => setIsOpen(true)}>Login</Button>}
-          </div>
-
-          {/* Hamburger menu (mobile) */}
-          <div className="flex items-center gap-x-4 md:hidden">
-            <div className="flex items-center gap-x-2">
-              {session && <Credits session={session} />}
-              {session ? (
-                <UserProfileIcon session={session} />
-              ) : (
-                <Button
-                  onClick={() => {
-                    setIsOpen(true);
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  Login
-                </Button>
-              )}
-            </div>
-            <Button
-              size={"icon"}
-              variant={"ghost"}
-              onClick={() => setMobileMenuOpen((open) => !open)}
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-              asChild
-            >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Mobile dropdown menu */}
-        <div
-          className={cn(
-            "bg-background absolute top-16 left-0 w-full overflow-hidden transition-all duration-300 md:hidden",
-            mobileMenuOpen ? "max-h-[500px] opacity-100" : "pointer-events-none max-h-0 opacity-0"
-          )}
-        >
-          <div className="flex flex-col gap-y-2 p-4">
-            {navigation.map((item) => (
-              <Button
-                key={item.name}
-                asChild
-                variant={"secondary"}
-                className="w-fit justify-start"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <Link href={item.href}>{item.name}</Link>
-              </Button>
-            ))}
-            <ThemeChanger />
-          </div>
-        </div>
-      </nav>
-      {/* Optional: overlay per chiudere il menu cliccando fuori */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-black/20 md:hidden" onClick={() => setMobileMenuOpen(false)} />
+    <nav
+      className={cn(
+        "bg-background fixed top-0 left-0 z-50 w-full transition-transform duration-300 ease-in-out",
+        isVisible ? "translate-y-0" : "-translate-y-full"
       )}
-    </>
+    >
+      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
+        <Link href="/">
+          <div className="flex items-center gap-x-4">
+            <Logo className="text-primary h-10 w-auto" />
+            <span className="text-2xl font-extrabold tracking-tight">IconVect</span>
+          </div>
+        </Link>
+
+        <div className="flex items-center gap-x-4">
+          <NavbarLinks />
+          <LeftSideNavbar />
+          <HamburgerMenu />
+        </div>
+      </div>
+    </nav>
   );
 }
+
+const NavbarLinks = () => {
+  return (
+    <div className="hidden gap-x-4 md:flex">
+      <ThemeChanger />
+      {navigation.map((item) => (
+        <Button key={item.name} asChild variant={"ghost"}>
+          <Link href={item.href}>{item.name}</Link>
+        </Button>
+      ))}
+    </div>
+  );
+};
+
+const HamburgerMenu = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  return (
+    <div className="flex md:hidden">
+      <Button
+        size="icon"
+        variant="ghost"
+        onClick={() => setMobileMenuOpen((open) => !open)}
+        aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+        className="size-7"
+        asChild
+      >
+        {mobileMenuOpen ? <X /> : <Menu />}
+      </Button>
+
+      <div
+        className={cn(
+          "bg-background absolute top-16 left-0 w-full overflow-hidden transition-all duration-300 md:hidden",
+          mobileMenuOpen ? "max-h-[500px] opacity-100" : "pointer-events-none max-h-0 opacity-0"
+        )}
+      >
+        <div className="flex flex-col gap-y-2 p-4">
+          {navigation.map((item) => (
+            <Button
+              key={item.name}
+              asChild
+              variant={"secondary"}
+              className="w-fit justify-start"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Link href={item.href}>{item.name}</Link>
+            </Button>
+          ))}
+          <ThemeChanger />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const LeftSideNavbar = () => {
+  const { data: session, status } = useSession();
+  const { setIsOpen } = useDialogStore();
+
+  const isAuthenticated = status === "authenticated";
+
+  if (status === "loading") {
+    return undefined;
+  }
+
+  return (
+    <div className={cn("flex items-center gap-x-4")}>
+      {isAuthenticated ? (
+        <>
+          <Credits session={session} />
+          <UserProfileIcon session={session} />
+        </>
+      ) : (
+        <Button onClick={() => setIsOpen(true)}>Login</Button>
+      )}
+    </div>
+  );
+};
 
 const Credits = ({ session }: { session: Session }) => {
   return (
