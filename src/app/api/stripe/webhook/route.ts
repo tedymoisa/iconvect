@@ -1,17 +1,22 @@
+import { env } from "@/env";
 import { type ApiResponse } from "@/lib/types/api-response";
 import { db } from "@/server/db";
 import { stripeClient } from "@/server/stripe";
 import { CreditTransactionType, OrderStatus, UserStatus } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
+import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
-  const sig = req.headers.get("stripe-signature");
+  const body = await req.text();
+  const headersList = await headers();
+  const signature = headersList.get("stripe-signature");
+
   let event: Stripe.Event;
 
   try {
-    event = stripeClient.webhooks.constructEvent(await req.text(), sig!, process.env.STRIPE_WEBHOOK_SECRET!);
+    event = stripeClient.webhooks.constructEvent(body, signature!, env.STRIPE_WEBHOOK_SECRET);
   } catch (error) {
     console.error("Error verifying webhook signature:", error);
     return NextResponse.json<ApiResponse<string>>({ result: "Webhook Error." }, { status: 400 });
