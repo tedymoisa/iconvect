@@ -9,12 +9,14 @@ import { api } from "@/trpc/react";
 import { Loader2, Sparkles } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 
 export default function GeneratorPrompt() {
   const { data: session } = useSession();
   const { setGeneratedSvg } = useSvgStore();
   const [prompt, setPrompt] = useState("");
   const { setIsOpen } = useDialogStore();
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const { mutate, isPending } = api.gemini.generate.useMutation();
 
@@ -37,7 +39,19 @@ export default function GeneratorPrompt() {
     }
   };
 
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const handleTextareaKeyDown = (
+    e: KeyboardEvent<HTMLTextAreaElement>,
+    isPending: boolean,
+    prompt: string,
+    handleGenerate: () => void
+  ) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (!isPending && prompt.trim()) {
+        handleGenerate();
+      }
+    }
+  };
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -61,6 +75,7 @@ export default function GeneratorPrompt() {
         onChange={(event) => setPrompt(event.target.value)}
         aria-label="SVG generation prompt"
         style={{ maxHeight: "calc(1.5em * 10)", overflowY: "auto" }}
+        onKeyDown={(e) => handleTextareaKeyDown(e, isPending, prompt, handleGenerate)}
       />
       <Button
         onClick={handleGenerate}
