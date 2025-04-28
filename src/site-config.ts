@@ -15,7 +15,7 @@ export const siteConfig: SiteConfig = {
   description:
     "Generate stunning, unique vector icons instantly using the power of AI. Create scalable SVG assets for your projects in seconds.",
   url: "https://iconvect.com",
-  ogImage: "/public/seo-cover.png",
+  ogImage: "/seo-cover.png",
   links: {
     github: "https://github.com/project-kt/iconvect"
   },
