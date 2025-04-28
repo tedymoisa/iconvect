@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { type NextRequest } from "next/server";
 import { twMerge } from "tailwind-merge";
 import { type SafeParseReturnType, type ZodError, type ZodSchema } from "zod";
+import DOMPurify from "isomorphic-dompurify";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -81,24 +82,53 @@ export function scrollPage(by: number, duration: number) {
 // }
 
 export async function extractAndSanitizeSvg(rawAiResponse: string): Promise<string | null> {
-  const svgRegex = /```(?:xml|svg)\n([\s\S]*?)\n```/;
-  const match = svgRegex.exec(rawAiResponse);
+  if (!rawAiResponse || typeof rawAiResponse !== "string") {
+    console.warn("Invalid input provided for SVG extraction.");
+    return null;
+  }
 
-  if (match?.[1]) {
-    const extractedSvg = match[1].trim(); // Get the captured group (SVG code) and trim whitespace
-    if (extractedSvg) {
-      return extractedSvg;
-    } else {
-      console.warn("Extracted SVG content is empty.");
+  let potentialSvg: string | null = null;
 
+  const fenceRegex = /```(?:xml|svg)\s*([\s\S]*?)\s*```/;
+  const fenceMatch = fenceRegex.exec(rawAiResponse);
+
+  if (fenceMatch?.[1]) {
+    potentialSvg = fenceMatch[1].trim();
+  } else {
+    const rawSvgRegex = /<svg[\s\S]*?<\/svg>/i;
+    const rawMatch = rawSvgRegex.exec(rawAiResponse);
+    if (rawMatch?.[0]) {
+      potentialSvg = rawMatch[0].trim();
+    }
+  }
+
+  if (!potentialSvg) {
+    console.warn("Could not extract SVG code using fence or raw tag regex.", {
+      rawInputSnippet: rawAiResponse.substring(0, 100) + "..."
+    });
+    return null;
+  }
+
+  if (potentialSvg.length === 0) {
+    console.warn("Extracted potential SVG content is empty.");
+    return null;
+  }
+
+  try {
+    const sanitizedSvg = DOMPurify.sanitize(potentialSvg, {
+      USE_PROFILES: { svg: true, svgFilters: true }
+    });
+
+    if (!sanitizedSvg || sanitizedSvg.trim().length === 0) {
+      console.error("SVG Sanitization resulted in an empty string.", {
+        originalSnippet: potentialSvg.substring(0, 100) + "..."
+      });
       return null;
     }
-  } else {
-    console.warn("Could not extract SVG code from the provided string using regex.");
-    // Optional: Fallback - If no markdown block, try sanitizing the whole input?
-    // Be cautious with this, it might sanitize non-SVG text unnecessarily.
-    // console.warn('Attempting to sanitize the entire input as SVG...');
-    // return sanitizeSvg(rawAiResponse.trim());
-    return null; // Recommended: Return null if extraction fails
+
+    return sanitizedSvg;
+  } catch (error) {
+    console.error("Error during SVG sanitization:", error);
+    return null;
   }
 }

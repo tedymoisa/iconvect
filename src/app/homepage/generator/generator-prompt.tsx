@@ -3,39 +3,31 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn, scrollPage } from "@/lib/utils";
-import { useDialogStore } from "@/store/dialog";
 import { useSvgStore } from "@/store/svg";
 import { api } from "@/trpc/react";
 import { Loader2, Sparkles } from "lucide-react";
-import { useSession } from "next-auth/react";
-import { useEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function GeneratorPrompt() {
-  const { data: session } = useSession();
   const { setGeneratedSvg } = useSvgStore();
   const [prompt, setPrompt] = useState("");
-  const { setIsOpen } = useDialogStore();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const { mutate, isPending } = api.gemini.generate.useMutation();
 
   const handleGenerate = () => {
-    if (session) {
-      if (prompt.length >= 0) {
-        mutate(
-          { prompt },
-          {
-            onSuccess: (data) => {
-              setGeneratedSvg(data);
+    if (prompt.length >= 0) {
+      mutate(
+        { prompt },
+        {
+          onSuccess: (data) => {
+            setGeneratedSvg(data);
 
-              scrollPage(300, 1000);
-            }
+            scrollPage(300, 1000);
           }
-        );
-      }
-    } else {
-      setIsOpen(true);
+        }
+      );
     }
   };
 
