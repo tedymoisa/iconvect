@@ -93,11 +93,11 @@ export default function Navbar() {
     <>
       <nav
         className={cn(
-          "fixed top-0 left-0 z-50 w-full transition-transform duration-300 ease-in-out",
+          "bg-background fixed top-0 left-0 z-50 w-full transition-transform duration-300 ease-in-out",
           isVisible ? "translate-y-0" : "-translate-y-full"
         )}
       >
-        <div className="bg-background mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
+        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
           <Link href="/">
             <div className="flex items-center gap-x-4">
               <Logo className="text-primary h-10 w-auto" />

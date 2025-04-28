@@ -21,8 +21,7 @@ export default function PriceCards({ prices }: { prices: Stripe.Price[] }) {
         const credits = Number.parseInt(product.metadata?.credits ?? "0");
         const amount = price.unit_amount ? (price.unit_amount / 100).toFixed(2) : "0.00";
 
-        const featuresString =
-          product.metadata.features ?? "Full SVG editing capabilities,Download in SVG format,24/7 support";
+        const featuresString = product.metadata.features ?? "SVG generation,24/7 support";
         const features = featuresString.split(",");
 
         return (
@@ -43,7 +42,6 @@ export default function PriceCards({ prices }: { prices: Stripe.Price[] }) {
             <div className="dark:bg-background_dark bg-background p-6">
               <div className="mb-8">
                 <h3 className="dark:text-foreground_dark text-foreground mb-2 text-xl font-bold">{product.name}</h3>
-                <p className="text-foreground-muted dark:text-foreground-muted_dark">{product.description}</p>
               </div>
 
               <div className="mb-6">

@@ -42,7 +42,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
-    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache"
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
+    "check:all": "pnpm run lint && pnpm run format:write && pnpm run typecheck"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.0",
