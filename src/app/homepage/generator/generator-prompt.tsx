@@ -110,14 +110,15 @@ export default function GeneratorPrompt() {
           onChange={(event) => setPrompt(event.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <div className="mt-3 flex items-end justify-between">
-          <ModelSelector />
+        <div className="mt-3 flex flex-col-reverse gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <ModelSelector isPending={isPending} />
           <Button
             type="submit"
             disabled={isPending || !prompt.trim()}
             size="lg"
             className={cn(
-              "ml-auto w-fit animate-[bg-shine_3s_linear_infinite] rounded-lg border-[1px] bg-[length:200%_100%] tracking-wide shadow",
+              "mx-auto sm:mx-0",
+              "w-fit animate-[bg-shine_3s_linear_infinite] rounded-lg border-[1px] bg-[length:200%_100%] tracking-wide shadow",
               "bg-[linear-gradient(110deg,var(--primary),45%,#E4E4E7,55%,var(--primary))]"
             )}
           >
@@ -139,39 +140,35 @@ export default function GeneratorPrompt() {
   }
 }
 
-const ModelSelector = () => {
+const ModelSelector = ({ isPending }: { isPending: boolean }) => {
   const { selectedModel, setSelectedModel } = useModelStore();
 
   const models: ModelOption[] = [
-    { name: "Gemini", description: "Fast and accurate" },
-    { name: "gpt-4", description: "Slow reasoning" },
-    { name: "gpt-4-32k", description: "Large context, slow" },
-    { name: "gpt-4-0613", description: "Slow reasoning" },
-    { name: "gpt-4-32k-0613", description: "Large context, slow" },
-    { name: "gpt-3.5-turbo", description: "Very fast, less accurate" },
-    { name: "gpt-3.5-turbo-16k", description: "Fast, large context" }
+    { name: "Svg Turbo", description: "Fast model" },
+    { name: "Svg Picasso", description: "Slow reasoning and accurate" }
   ];
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="mx-auto flex items-center gap-2 sm:mx-0">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
             className="text-muted-foreground focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
             size={"sm"}
+            disabled={isPending}
           >
             {selectedModel.name} <ChevronDown className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>Models</DropdownMenuLabel>
+          <DropdownMenuLabel>Svg Generator Models</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {models.map((model: ModelOption) => (
             <DropdownMenuItem
               key={model.name}
               onClick={() => setSelectedModel(model)}
-              className={selectedModel.name === model.name ? "text-primary font-bold" : ""}
+              className={selectedModel.name === model.name ? "text-primary cursor-pointer font-bold" : "cursor-pointer"}
             >
               <div>
                 <div>{model.name}</div>

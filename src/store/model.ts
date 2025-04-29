@@ -13,8 +13,8 @@ interface ModelStore {
 }
 
 const defaultModel: ModelOption = {
-  name: "Gemini",
-  description: "Fast and accurate"
+  name: "Svg Turbo",
+  description: "Fast model"
 };
 
 export const useModelStore = create<ModelStore>()(

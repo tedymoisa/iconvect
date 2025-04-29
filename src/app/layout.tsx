@@ -54,7 +54,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Providers>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <Navbar />
-            {children}
+            <div className="mt-20">{children}</div>
             <Footer />
             <AuthModal />
           </ThemeProvider>

@@ -33,7 +33,7 @@ export default function SvgPreview() {
           <TabsContent value="preview">
             <PreviewTab svg={generatedSvg} />
           </TabsContent>
-          <TabsContent value="code" className="max-w-screen px-4">
+          <TabsContent value="code">
             <CodeTab svg={generatedSvg} />
           </TabsContent>
         </Tabs>
@@ -79,18 +79,20 @@ function CodeTab({ svg }: { svg: string }) {
           {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
         </Button>
       </div>
-      <SyntaxHighlighter
-        language="xml"
-        style={theme === "light" ? atomOneLight : gradientDark}
-        customStyle={{
-          fontSize: "15px",
-          maxHeight: "18rem",
-          padding: "1rem",
-          background: "var(--card)"
-        }}
-      >
-        {svg}
-      </SyntaxHighlighter>
+      <div className="max-w-[calc(100vw-2rem)]">
+        <SyntaxHighlighter
+          language="xml"
+          style={theme === "light" ? atomOneLight : gradientDark}
+          customStyle={{
+            fontSize: "15px",
+            maxHeight: "18rem",
+            padding: "1rem",
+            background: "var(--card)"
+          }}
+        >
+          {svg}
+        </SyntaxHighlighter>
+      </div>
     </div>
   );
 }
