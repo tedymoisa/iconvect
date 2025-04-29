@@ -1,12 +1,22 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { cn, scrollPage } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
+import type { ModelOption } from "@/store/model";
+import { useModelStore } from "@/store/model";
 import { useSvgStore } from "@/store/svg";
 import { api } from "@/trpc/react";
-import { Loader2, Sparkles, X } from "lucide-react";
+import { ChevronDown, Loader2, Sparkles, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
@@ -60,6 +70,8 @@ export default function GeneratorPrompt() {
   };
 
   useEffect(() => {
+    textareaRef.current?.focus();
+
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = "auto";
@@ -86,11 +98,11 @@ export default function GeneratorPrompt() {
     );
   } else {
     return (
-      <form ref={formRef} onSubmit={handleGenerate} className="flex flex-col gap-4 sm:flex-row">
+      <form ref={formRef} onSubmit={handleGenerate}>
         <Textarea
           ref={textareaRef}
           placeholder="e.g., A pencil that represents editing"
-          className="w-full resize-none border-none shadow-none outline-none focus:border-none focus:ring-0 focus:outline-none focus-visible:border-none focus-visible:ring-0 focus-visible:outline-none"
+          className="resize-none border-none shadow-none outline-none focus:border-none focus:ring-0 focus:outline-none focus-visible:border-none focus-visible:ring-0 focus-visible:outline-none"
           value={prompt}
           rows={1}
           aria-label="SVG generation prompt"
@@ -98,28 +110,78 @@ export default function GeneratorPrompt() {
           onChange={(event) => setPrompt(event.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <Button
-          type="submit"
-          disabled={isPending || !prompt.trim()}
-          size="lg"
-          className={cn(
-            "mx-auto w-fit animate-[bg-shine_3s_linear_infinite] rounded-lg border-[1px] bg-[length:200%_100%] tracking-wide shadow",
-            "bg-[linear-gradient(110deg,var(--primary),45%,#E4E4E7,55%,var(--primary))]"
-          )}
-        >
-          {isPending ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              <span>Generating...</span>
-            </>
-          ) : (
-            <>
-              <Sparkles className="mr-2 h-5 w-5" />
-              <span>Generate</span>
-            </>
-          )}
-        </Button>
+        <div className="mt-3 flex items-end justify-between">
+          <ModelSelector />
+          <Button
+            type="submit"
+            disabled={isPending || !prompt.trim()}
+            size="lg"
+            className={cn(
+              "ml-auto w-fit animate-[bg-shine_3s_linear_infinite] rounded-lg border-[1px] bg-[length:200%_100%] tracking-wide shadow",
+              "bg-[linear-gradient(110deg,var(--primary),45%,#E4E4E7,55%,var(--primary))]"
+            )}
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <span>Generating...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-5 w-5" />
+                <span>Generate</span>
+              </>
+            )}
+          </Button>
+        </div>
       </form>
     );
   }
 }
+
+const ModelSelector = () => {
+  const { selectedModel, setSelectedModel } = useModelStore();
+
+  const models: ModelOption[] = [
+    { name: "Gemini", description: "Fast and accurate" },
+    { name: "gpt-4", description: "Slow reasoning" },
+    { name: "gpt-4-32k", description: "Large context, slow" },
+    { name: "gpt-4-0613", description: "Slow reasoning" },
+    { name: "gpt-4-32k-0613", description: "Large context, slow" },
+    { name: "gpt-3.5-turbo", description: "Very fast, less accurate" },
+    { name: "gpt-3.5-turbo-16k", description: "Fast, large context" }
+  ];
+
+  return (
+    <div className="flex items-center gap-2">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="text-muted-foreground focus:border-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none"
+            size={"sm"}
+          >
+            {selectedModel.name} <ChevronDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>Models</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {models.map((model: ModelOption) => (
+            <DropdownMenuItem
+              key={model.name}
+              onClick={() => setSelectedModel(model)}
+              className={selectedModel.name === model.name ? "text-primary font-bold" : ""}
+            >
+              <div>
+                <div>{model.name}</div>
+                <div className="text-muted-foreground text-xs">{model.description}</div>
+              </div>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <p className="text-muted-foreground text-sm">{selectedModel.description}</p>
+    </div>
+  );
+};
