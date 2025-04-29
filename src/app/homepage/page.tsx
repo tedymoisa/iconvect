@@ -11,7 +11,7 @@ export default function HomePage() {
           "size-full bg-gradient-to-tr from-zinc-50/90 via-zinc-50/40 to-zinc-50/10 dark:from-zinc-950/90 dark:via-zinc-950/40 dark:to-zinc-950/10"
         }
       >
-        <main className="mx-auto flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-4">
+        <main className="mx-auto flex min-h-[calc(100vh-4rem-5rem)] flex-col items-center justify-center px-4">
           <BlurIn>
             <div className={"bg-secondary mx-auto w-fit rounded-xl border p-1 px-3 text-sm"}>Release v1.0.0</div>
             <div className="mt-5 flex max-w-3xl flex-col items-center">
