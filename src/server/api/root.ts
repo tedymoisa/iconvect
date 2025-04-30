@@ -1,8 +1,6 @@
-import { postRouter } from "@/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { stripeRouter } from "./routers/stripe";
-import { geminiRouter } from "./routers/gemini";
-import { openaiRouter } from "./routers/openai";
+import { svgRouter } from "./routers/svg";
 
 /**
  * This is the primary router for your server.
@@ -10,10 +8,8 @@ import { openaiRouter } from "./routers/openai";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  post: postRouter,
   stripe: stripeRouter,
-  gemini: geminiRouter,
-  openai: openaiRouter
+  svg: svgRouter
 });
 
 // export type definition of API

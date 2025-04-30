@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import { type AiModelOption } from "@/store/model";
 
 export const apiUrl = env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
@@ -10,3 +11,30 @@ export const MOCK_SVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24
   <path d='M4.5 19.6 H 19.5 V 21.6 H 4.5 Z' />
 </svg>
 `;
+
+export enum ICONVECT_AI_MODELS {
+  SVG_TURBO = "gemini-2.5-flash-preview-04-17",
+  SVG_PICASSO = "gemini-2.5-pro-preview-04-17"
+}
+
+export enum ICONVECT_AI_GENERATORS {
+  OPENAI,
+  GEMINI
+}
+
+export const AI_MODELS: Record<keyof typeof ICONVECT_AI_MODELS, AiModelOption> = {
+  SVG_TURBO: {
+    name: "SVG Turbo",
+    description: "Fast model",
+    model: ICONVECT_AI_MODELS.SVG_TURBO,
+    generator: ICONVECT_AI_GENERATORS.GEMINI,
+    cost: 1
+  },
+  SVG_PICASSO: {
+    name: "SVG Picasso",
+    description: "Slow reasoning and accurate",
+    model: ICONVECT_AI_MODELS.SVG_PICASSO,
+    generator: ICONVECT_AI_GENERATORS.GEMINI,
+    cost: 2
+  }
+};

@@ -1,23 +1,23 @@
-// store.ts
+import { AI_MODELS, type ICONVECT_AI_GENERATORS, type ICONVECT_AI_MODELS } from "@/lib/constants";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export interface ModelOption {
+export interface AiModelOption {
   name: string;
   description: string;
+  model: ICONVECT_AI_MODELS;
+  generator: ICONVECT_AI_GENERATORS;
+  cost: number;
 }
 
-interface ModelStore {
-  selectedModel: ModelOption;
-  setSelectedModel: (model: ModelOption) => void;
+interface AiModelStore {
+  selectedModel: AiModelOption;
+  setSelectedModel: (model: AiModelOption) => void;
 }
 
-const defaultModel: ModelOption = {
-  name: "Svg Turbo",
-  description: "Fast model"
-};
+const defaultModel: AiModelOption = AI_MODELS.SVG_TURBO;
 
-export const useModelStore = create<ModelStore>()(
+export const useModelStore = create<AiModelStore>()(
   persist(
     (set) => ({
       selectedModel: defaultModel,
