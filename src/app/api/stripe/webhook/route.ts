@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import { tryCatch, tryCatchSync } from "@/lib/try-catch";
 import { type ApiResponse } from "@/lib/types/api-response";
 import { db } from "@/server/db";
 import { stripeClient } from "@/server/stripe";
@@ -13,13 +14,12 @@ export async function POST(req: NextRequest) {
   const headersList = await headers();
   const signature = headersList.get("stripe-signature");
 
-  let event: Stripe.Event;
-
-  try {
-    event = stripeClient.webhooks.constructEvent(body, signature!, env.STRIPE_WEBHOOK_SECRET);
-  } catch (error) {
-    console.error("Error verifying webhook signature:", error);
-    return NextResponse.json<ApiResponse<string>>({ result: "Webhook Error." }, { status: 400 });
+  const { data: event, error } = tryCatchSync(() =>
+    stripeClient.webhooks.constructEvent(body, signature!, env.STRIPE_WEBHOOK_SECRET)
+  );
+  if (error) {
+    console.error("Stripe webhook signature verification failed:", error);
+    return NextResponse.json({ error: "Invalid webhook signature" }, { status: 400 });
   }
 
   switch (event.type) {
@@ -52,18 +52,25 @@ async function checkoutSessionCompleted(event: Stripe.Event) {
       return NextResponse.json<ApiResponse<string>>({ result: "Invalid metadata." }, { status: 200 });
     }
 
-    const existingOrder = await db.order.findUnique({
-      where: { providerOrderId: session.id }
-    });
+    const { data: existingOrder, error: findOrderError } = await tryCatch(
+      db.order.findUnique({
+        where: { providerOrderId: session.id }
+      })
+    );
+    if (findOrderError) {
+      console.error(`🚨 Failed to check existing order for Session ${session.id}:`, findOrderError);
+      return NextResponse.json<ApiResponse<string>>({ result: "Database error." }, { status: 500 });
+    }
+
     if (existingOrder && existingOrder.status === OrderStatus.COMPLETED) {
       console.log(`🔁 Order ${existingOrder.id} already processed for Session ${session.id}. Skipping.`);
       return NextResponse.json<ApiResponse<string>>({ result: "Already processed." }, { status: 200 });
     }
 
-    try {
-      const amountDecimal = new Decimal((session.amount_total ?? 0) / 100);
+    const amountDecimal = new Decimal((session.amount_total ?? 0) / 100);
 
-      await db.$transaction(async (tx) => {
+    const { error: transactionError } = await tryCatch(
+      db.$transaction(async (tx) => {
         // Create/Update Order
         const order = await tx.order.upsert({
           where: { providerOrderId: session.id },
@@ -124,9 +131,11 @@ async function checkoutSessionCompleted(event: Stripe.Event) {
         console.log(
           `✅ Successfully processed Session ${session.id}. User ${userId} granted ${numberOfCredits} credits. Order ${order.id} created.`
         );
-      });
-    } catch (error) {
-      console.error(`🚨 Database update failed for Session ${session.id}:`, error);
+      })
+    );
+
+    if (transactionError) {
+      console.error(`🚨 Database update failed for Session ${session.id}:`, transactionError);
       return NextResponse.json<ApiResponse<string>>({ result: "Database update failed." }, { status: 500 });
     }
   } else {
