@@ -106,7 +106,9 @@ const NavbarLinks = () => {
       <ThemeChanger />
       {navigation.map((item) => (
         <Button key={item.name} asChild variant={"ghost"}>
-          <Link href={item.href}>{item.name}</Link>
+          <Link href={item.href} prefetch={true}>
+            {item.name}
+          </Link>
         </Button>
       ))}
     </div>
@@ -131,11 +133,11 @@ const HamburgerMenu = () => {
 
       <div
         className={cn(
-          "bg-background absolute top-16 left-0 w-full overflow-hidden transition-all duration-300 md:hidden",
+          "absolute top-16 left-0 w-full overflow-hidden transition-all duration-300 md:hidden",
           mobileMenuOpen ? "max-h-[500px] opacity-100" : "pointer-events-none max-h-0 opacity-0"
         )}
       >
-        <div className="flex flex-col gap-y-2 p-4">
+        <div className="flex flex-col gap-y-2 border-b p-4 backdrop-blur-lg">
           {navigation.map((item) => (
             <Button
               key={item.name}
@@ -144,7 +146,9 @@ const HamburgerMenu = () => {
               className="w-fit justify-start"
               onClick={() => setMobileMenuOpen(false)}
             >
-              <Link href={item.href}>{item.name}</Link>
+              <Link href={item.href} prefetch={true}>
+                {item.name}
+              </Link>
             </Button>
           ))}
           <ThemeChanger />
