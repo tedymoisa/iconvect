@@ -10,9 +10,9 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
+import { AI_MODELS } from "@/lib/constants";
 import { cn, scrollPage } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
-import type { ModelOption } from "@/store/model";
 import { useModelStore } from "@/store/model";
 import { useSvgStore } from "@/store/svg";
 import { api } from "@/trpc/react";
@@ -23,14 +23,21 @@ import { useEffect, useRef, useState } from "react";
 import SvgLoading from "./svg-loading";
 
 export default function GeneratorPrompt() {
-  const { data: session } = useSession();
-  const { setGeneratedSvg } = useSvgStore();
+  console.log("generator prompt");
+  const { data: session, update } = useSession();
   const [prompt, setPrompt] = useState("");
+
+  const { setGeneratedSvg } = useSvgStore();
   const { setIsOpen } = useDialogStore();
+
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const { mutate, isPending } = api.gemini.generate.useMutation();
+  const { mutate, isPending } = api.svg.generate.useMutation({
+    onSuccess: async () => {
+      await update();
+    }
+  });
 
   const handleGenerate = (event: FormEvent) => {
     event.preventDefault();
@@ -38,7 +45,7 @@ export default function GeneratorPrompt() {
     if (session) {
       if (prompt.length > 0) {
         mutate(
-          { prompt },
+          { prompt, model: AI_MODELS.SVG_TURBO },
           {
             onSuccess: (data) => {
               setGeneratedSvg(data);
@@ -143,11 +150,6 @@ export default function GeneratorPrompt() {
 const ModelSelector = ({ isPending }: { isPending: boolean }) => {
   const { selectedModel, setSelectedModel } = useModelStore();
 
-  const models: ModelOption[] = [
-    { name: "Svg Turbo", description: "Fast model" },
-    { name: "Svg Picasso", description: "Slow reasoning and accurate" }
-  ];
-
   return (
     <div className="mx-auto flex items-center gap-2 sm:mx-0">
       <DropdownMenu>
@@ -164,15 +166,17 @@ const ModelSelector = ({ isPending }: { isPending: boolean }) => {
         <DropdownMenuContent>
           <DropdownMenuLabel>Svg Generator Models</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {models.map((model: ModelOption) => (
+          {Object.entries(AI_MODELS).map(([model, option]) => (
             <DropdownMenuItem
-              key={model.name}
-              onClick={() => setSelectedModel(model)}
-              className={selectedModel.name === model.name ? "text-primary cursor-pointer font-bold" : "cursor-pointer"}
+              key={model}
+              onClick={() => setSelectedModel(option)}
+              className={
+                selectedModel.name === option.name ? "text-primary cursor-pointer font-bold" : "cursor-pointer"
+              }
             >
               <div>
-                <div>{model.name}</div>
-                <div className="text-muted-foreground text-xs">{model.description}</div>
+                <div>{option.name}</div>
+                <div className="text-muted-foreground text-xs">{option.description}</div>
               </div>
             </DropdownMenuItem>
           ))}
