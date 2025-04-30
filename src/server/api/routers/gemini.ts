@@ -1,7 +1,8 @@
 import { env } from "@/env";
 import { MOCK_SVG } from "@/lib/constants";
-import { extractAndSanitizeSvg } from "@/lib/utils";
+import { tryCatch } from "@/lib/try-catch";
 import { geminiClient } from "@/server/gemini";
+import { svgService } from "@/server/services/svg-service";
 import { type GenerationConfig, HarmBlockThreshold, HarmCategory } from "@google/genai";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -41,85 +42,71 @@ export const geminiRouter = createTRPCRouter({
       const { prompt } = input;
 
       console.log(`User ${userId} generating SVG with prompt: "${prompt}"`);
+
       if (env.NODE_ENV === "development") {
         return MOCK_SVG;
       }
 
-      try {
-        const result = await geminiClient.models.generateContent({
+      // 1. Gemini API call
+      const { data: result, error: geminiError } = await tryCatch(
+        geminiClient.models.generateContent({
           model: env.GOOGLE_GEMINI_MODEL ?? defaultModel,
           contents: {
             role: "user",
-            parts: [
-              {
-                text: prompt
-              }
-            ]
+            parts: [{ text: prompt }]
           },
           config: {
             systemInstruction: [{ text: systemInstruction }],
-            thinkingConfig: {
-              includeThoughts: false
-            },
+            thinkingConfig: { includeThoughts: false },
             ...generationConfig,
             ...safetySettings
           }
-        });
+        })
+      );
 
-        const candidate = result.candidates?.[0];
-        if (!candidate) {
-          console.error("Gemini Error: No candidates found in response.", result);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR", // Or UNPROCESSABLE_CONTENT
-            message: "Failed to generate SVG: No response from AI model."
-          });
-        }
-
-        const part = candidate.content?.parts?.[0];
-        const rawSvg = part?.text;
-
-        if (!rawSvg || typeof rawSvg !== "string" || rawSvg.trim().length === 0) {
-          console.error("Gemini Error: No text part found in the candidate.", candidate);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to generate SVG: Empty response from AI model."
-          });
-        }
-
-        console.log("Raw SVG received from Gemini:", rawSvg.substring(0, 100) + "..."); // Log snippet
-
-        let sanitizedSvg: string | null = null;
-        try {
-          sanitizedSvg = await extractAndSanitizeSvg(rawSvg);
-        } catch (sanitizeError) {
-          console.error("SVG Sanitization Error:", sanitizeError);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to process the generated SVG.",
-            cause: sanitizeError
-          });
-        }
-
-        if (!sanitizedSvg || sanitizedSvg.trim().length === 0) {
-          console.error("SVG Sanitization Resulted in Empty Output. Raw SVG:", rawSvg);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Generated SVG was invalid or could not be sanitized."
-          });
-        }
-
-        return sanitizedSvg;
-      } catch (error: unknown) {
-        if (error instanceof TRPCError) {
-          throw error;
-        }
-
-        console.error("Error during SVG generation:", error);
+      if (geminiError) {
+        console.error("Gemini API Error:", geminiError);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "An unexpected error occurred while generating the SVG.",
-          cause: error
+          message: "Failed to generate SVG: Error from AI model.",
+          cause: geminiError
         });
       }
+
+      const candidate = result.candidates?.[0];
+      if (!candidate) {
+        console.error("Gemini Error: No candidates found in response.", result);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to generate SVG: No response from AI model."
+        });
+      }
+
+      const part = candidate.content?.parts?.[0];
+      const rawSvg = part?.text;
+
+      if (!rawSvg || typeof rawSvg !== "string" || rawSvg.trim().length === 0) {
+        console.error("Gemini Error: No text part found in the candidate.", candidate);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to generate SVG: Empty response from AI model."
+        });
+      }
+
+      console.log("Raw SVG received from Gemini:", rawSvg.substring(0, 100));
+
+      // 2. Sanitize SVG
+      const { data: sanitizedSvg, error: sanitizeError } = await tryCatch(svgService.sanitizeSvg(rawSvg));
+      if (sanitizeError) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Generated SVG was invalid or could not be sanitized.",
+          cause: sanitizeError
+        });
+      }
+
+      console.log("SVG sanitized correctly.");
+
+      return sanitizedSvg;
     })
 });

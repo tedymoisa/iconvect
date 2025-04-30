@@ -1,5 +1,6 @@
 "use client";
 
+import { tryCatchSync } from "@/lib/try-catch";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
@@ -33,15 +34,13 @@ function Test() {
   const svgDataUri = useMemo(() => {
     if (!data) return null;
 
-    try {
-      const base64Svg = btoa(data);
-
-      return `data:image/svg+xml;base64,${base64Svg}`;
-    } catch (e) {
-      console.error("Error encoding SVG to Base64:", e);
-
-      return null; // Return null if encoding fails
+    const { data: base64Svg, error } = tryCatchSync(() => btoa(data));
+    if (error) {
+      console.error("Error encoding SVG to Base64:", error);
+      return null;
     }
+
+    return `data:image/svg+xml;base64,${base64Svg}`;
   }, [data]);
 
   return (

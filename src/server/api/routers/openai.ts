@@ -3,8 +3,9 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { openaiClient } from "@/server/openai";
 import { env } from "@/env";
 import { TRPCError } from "@trpc/server";
-import { extractAndSanitizeSvg } from "@/lib/utils";
 import OpenAI from "openai";
+import { svgService } from "@/server/services/svg-service";
+import { tryCatch } from "@/lib/try-catch";
 
 const defaultModel = "gpt-4o-mini";
 const systemPrompt =
@@ -24,8 +25,9 @@ export const openaiRouter = createTRPCRouter({
 
       console.log(`User ${userId} generating SVG with OpenAI prompt: "${prompt}"`);
 
-      try {
-        const completion = await openaiClient.chat.completions.create({
+      // 1. OpenAI completion
+      const { data: completion, error: openAiError } = await tryCatch(
+        openaiClient.chat.completions.create({
           model: env.OPENAI_MODEL ?? defaultModel,
           messages: [
             {
@@ -39,62 +41,58 @@ export const openaiRouter = createTRPCRouter({
           ],
           temperature: 0.3,
           max_tokens: 1000
-        });
+        })
+      );
 
-        const choice = completion.choices?.[0];
-        const rawSvgContent = choice?.message?.content;
-
-        if (!rawSvgContent || rawSvgContent.trim().length === 0) {
-          console.error("OpenAI Error: No content found in response.", completion);
+      if (openAiError) {
+        if (openAiError instanceof OpenAI.APIError) {
+          console.error("OpenAI API Error:", openAiError.status, openAiError.name, openAiError.message);
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to generate SVG: Empty response from AI model."
+            message: `Failed to communicate with AI service: ${openAiError.message}`,
+            cause: openAiError
           });
         }
-
-        console.log("Raw content received from OpenAI:", rawSvgContent.substring(0, 100) + "...");
-
-        let sanitizedSvg: string | null = null;
-        try {
-          sanitizedSvg = await extractAndSanitizeSvg(rawSvgContent);
-        } catch (sanitizeError) {
-          console.error("SVG Extraction/Sanitization Error:", sanitizeError);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to process the generated SVG.",
-            cause: sanitizeError
-          });
-        }
-
-        if (!sanitizedSvg || sanitizedSvg.trim().length === 0) {
-          console.error("SVG Sanitization Resulted in Empty Output. Raw Content:", rawSvgContent);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Generated SVG was invalid or could not be processed."
-          });
-        }
-
-        return sanitizedSvg;
-      } catch (error: unknown) {
-        if (error instanceof TRPCError) {
-          throw error;
-        }
-
-        if (error instanceof OpenAI.APIError) {
-          console.error("OpenAI API Error:", error.status, error.name, error.message);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `Failed to communicate with AI service: ${error.message}`,
-            cause: error
-          });
-        }
-
-        console.error("Error during OpenAI SVG generation:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "An unexpected error occurred while generating the SVG.",
-          cause: error
+          message: "Failed to generate SVG: Error from AI model.",
+          cause: openAiError
         });
       }
+
+      const choice = completion.choices?.[0];
+      const rawSvgContent = choice?.message?.content;
+
+      if (!rawSvgContent || rawSvgContent.trim().length === 0) {
+        console.error("OpenAI Error: No content found in response.", completion);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to generate SVG: Empty response from AI model."
+        });
+      }
+
+      console.log("Raw content received from OpenAI:", rawSvgContent.substring(0, 100) + "...");
+
+      // 2. Sanitize SVG
+      const { data: sanitizedSvg, error: sanitizeError } = await tryCatch(svgService.sanitizeSvg(rawSvgContent));
+
+      if (sanitizeError) {
+        console.error("SVG Extraction/Sanitization Error:", sanitizeError);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to process the generated SVG.",
+          cause: sanitizeError
+        });
+      }
+
+      if (!sanitizedSvg || sanitizedSvg.trim().length === 0) {
+        console.error("SVG Sanitization Resulted in Empty Output. Raw Content:", rawSvgContent);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Generated SVG was invalid or could not be processed."
+        });
+      }
+
+      return sanitizedSvg;
     })
 });
