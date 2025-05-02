@@ -5,35 +5,49 @@ import Stripe from "stripe";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { tryCatch } from "@/lib/try-catch";
+import { cache } from "react";
 
 export const stripeRouter = createTRPCRouter({
   prices: publicProcedure.output(z.array(z.custom<Stripe.Price>())).query(async () => {
-    const { data: prices, error } = await tryCatch(
-      stripeClient.prices.list({
-        active: true,
-        type: "one_time",
-        currency: "eur",
-        expand: ["data.product"]
-      })
-    );
+    const fetchPricesCached = cache(async () => {
+      const { data: prices, error } = await tryCatch(
+        stripeClient.prices.list({
+          active: true,
+          type: "one_time",
+          currency: "eur",
+          expand: ["data.product"]
+        })
+      );
 
-    if (error) {
-      if (error instanceof Stripe.errors.StripeError) {
+      if (error) {
+        if (error instanceof Stripe.errors.StripeError) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `Stripe Error: ${error.message}`,
+            cause: error
+          });
+        }
+
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: `Stripe Error: ${error.message}`,
+          message: "An unexpected error occurred while fetching prices.",
           cause: error
         });
       }
 
+      return prices;
+    });
+
+    const { data: cachedPrices, error } = await tryCatch(fetchPricesCached());
+    if (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "An unexpected error occurred while fetching prices.",
+        message: "An unexpected error occurred while caching prices.",
         cause: error
       });
     }
 
-    const validPrices = prices.data.filter((price) => {
+    const validPrices = cachedPrices.data.filter((price) => {
       const product = price.product as Stripe.Product;
       return product.metadata.credits && typeof price.product === "object";
     });
