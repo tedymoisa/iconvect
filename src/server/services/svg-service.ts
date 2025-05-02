@@ -1,7 +1,6 @@
 import { type ICONVECT_AI_MODELS } from "@/lib/constants";
 import { tryCatch } from "@/lib/try-catch";
 import { type GenerationConfig, HarmBlockThreshold, HarmCategory } from "@google/genai";
-import DOMPurify from "dompurify";
 import OpenAI from "openai";
 import { geminiClient } from "../gemini";
 import { openaiClient } from "../openai";
@@ -64,21 +63,12 @@ export const svgService = {
       throw new Error("Failed to generate SVG: Empty response from AI model.");
     }
 
-    console.log("Raw SVG received from Gemini:", rawSvg.substring(0, 100));
+    console.log("Raw SVG received from Gemini:", rawSvg);
 
-    // 2. Sanitize SVG
-    const { data: sanitizedSvg, error: sanitizeError } = await tryCatch(svgService.sanitizeSvg(rawSvg));
-    if (sanitizeError) {
-      throw new Error("Generated SVG was invalid or could not be sanitized.");
-    }
-
-    console.log("SVG sanitized correctly.");
-
-    return sanitizedSvg;
+    return rawSvg;
   },
 
   openaiSvg: async (model: ICONVECT_AI_MODELS, prompt: string) => {
-    // 1. Generate SVG with OpenAi
     const { data: completion, error: openAiError } = await tryCatch(
       openaiClient.chat.completions.create({
         model: model,
@@ -115,61 +105,6 @@ export const svgService = {
 
     console.log("Raw content received from OpenAI:", rawSvg);
 
-    // 2. Sanitize SVG
-    const { data: sanitizedSvg, error: sanitizeError } = await tryCatch(svgService.sanitizeSvg(rawSvg));
-    if (sanitizeError) {
-      throw new Error("Generated SVG was invalid or could not be sanitized.");
-    }
-
-    console.log("SVG sanitized correctly.");
-
-    return sanitizedSvg;
-  },
-
-  sanitizeSvg: async (rawAiResponse: string): Promise<string> => {
-    if (!rawAiResponse || typeof rawAiResponse !== "string") {
-      throw new Error("Invalid input provided for SVG extraction.");
-    }
-
-    let potentialSvg: string | null = null;
-
-    const fenceRegex = /```(?:xml|svg)\s*([\s\S]*?)\s*```/;
-    const fenceMatch = fenceRegex.exec(rawAiResponse);
-
-    if (fenceMatch?.[1]) {
-      potentialSvg = fenceMatch[1].trim();
-    } else {
-      const rawSvgRegex = /<svg[\s\S]*?<\/svg>/i;
-      const rawMatch = rawSvgRegex.exec(rawAiResponse);
-      if (rawMatch?.[0]) {
-        potentialSvg = rawMatch[0].trim();
-      }
-    }
-
-    if (!potentialSvg) {
-      throw new Error("Could not extract SVG code using fence or raw tag regex.");
-    }
-
-    if (potentialSvg.length === 0) {
-      throw new Error("Extracted potential SVG content is empty.");
-    }
-
-    const { data: sanitizedSvg, error } = await tryCatch(
-      Promise.resolve(
-        DOMPurify.sanitize(potentialSvg, {
-          USE_PROFILES: { svg: true, svgFilters: true }
-        })
-      )
-    );
-
-    if (error) {
-      throw new Error(`Error during SVG sanitization: ${error.message}`);
-    }
-
-    if (!sanitizedSvg || sanitizedSvg.trim().length === 0) {
-      throw new Error("SVG Sanitization resulted in an empty string.");
-    }
-
-    return sanitizedSvg;
+    return rawSvg;
   }
 };
