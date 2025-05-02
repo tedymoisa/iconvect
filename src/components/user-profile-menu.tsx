@@ -19,6 +19,7 @@ export default function UserProfileMenu({ session }: { session: Session }) {
             <Image
               src={session.user.image}
               fill={true}
+              sizes="32px"
               alt={`${session?.user.name ?? "User"}'s profile picture`}
               className="rounded-full"
             />
