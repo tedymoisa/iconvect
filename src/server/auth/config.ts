@@ -7,6 +7,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { db } from "@/server/db";
 import { type UserStatus } from "@prisma/client";
 import { env } from "@/env";
+import { type Decimal } from "@prisma/client/runtime/library";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -18,7 +19,7 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       id: string;
-      credits: number;
+      credits: Decimal;
       status: UserStatus;
       // ...other properties
       // role: UserRole;
@@ -26,7 +27,7 @@ declare module "next-auth" {
   }
 
   interface User {
-    credits: number;
+    credits: Decimal;
     status: UserStatus;
     // ...other properties
     // role: UserRole;

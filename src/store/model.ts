@@ -1,4 +1,5 @@
 import { AI_MODELS, type ICONVECT_AI_GENERATORS, type ICONVECT_AI_MODELS } from "@/lib/constants";
+import { type Decimal } from "@prisma/client/runtime/library";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -7,7 +8,7 @@ export interface AiModelOption {
   description: string;
   model: ICONVECT_AI_MODELS;
   generator: ICONVECT_AI_GENERATORS;
-  cost: number;
+  cost: Decimal;
 }
 
 interface AiModelStore {

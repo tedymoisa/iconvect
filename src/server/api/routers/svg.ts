@@ -7,13 +7,14 @@ import { AiGenerationStatus } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { zDecimal } from "@/lib/utils";
 
 const aiModelOptionSchema = z.object({
   name: z.string(),
   description: z.string(),
   model: z.nativeEnum(ICONVECT_AI_MODELS),
   generator: z.nativeEnum(ICONVECT_AI_GENERATORS),
-  cost: z.number()
+  cost: zDecimal
 });
 
 export const svgRouter = createTRPCRouter({

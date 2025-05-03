@@ -187,7 +187,7 @@ const Credits = ({ session }: { session: Session }) => {
     <Link href="/prices">
       <div className="bg-muted flex w-fit items-center gap-x-1 rounded-md border px-3 py-1 text-sm">
         <Coins className="h-4 w-4" />
-        <span className="font-bold">{session.user.credits}</span>
+        <span className="font-bold">{String(session.user.credits)}</span>
       </div>
     </Link>
   );

@@ -58,7 +58,7 @@ function ModelSelector({ isPending }: ModelSelectorProps) {
         {selectedModel.description} <Brain className="h-4 w-4" />
       </div>
       <div className="text-muted-foreground flex items-center gap-1 border-l-2 pl-2 text-sm">
-        Cost: <span className="text-primary font-bold">{selectedModel.cost}</span>
+        Cost: <span className="text-primary font-bold">{String(selectedModel.cost)}</span>
         <Coins className="h-4 w-4" />
       </div>
     </div>

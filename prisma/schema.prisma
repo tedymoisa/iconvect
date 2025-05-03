@@ -38,6 +38,7 @@ enum CreditTransactionType {
     PURCHASE // Credits bought
     GENERATION // Credits spent on AI generation
     TRIAL_GRANT // Initial trial credits
+    SAVE_TO_LIBRARY
     REFUND // Credits refunded to user
     ADJUSTMENT // Manual admin adjustment
 }
@@ -87,7 +88,7 @@ model User {
     emailVerified DateTime? @map("email_verified")
     image         String?
 
-    credits     Int        @default(15)
+    credits     Decimal    @default(15)
     status      UserStatus @default(TRIAL)
     createdAt   DateTime   @default(now()) @map("created_at")
     updatedAt   DateTime   @updatedAt @map("updated_at")
@@ -117,7 +118,7 @@ model CreditTransaction {
     id          String                @id @default(cuid())
     userId      String                @map("user_id")
     user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-    amount      Int
+    amount      Decimal
     type        CreditTransactionType
     description String?
     createdAt   DateTime              @default(now()) @map("created_at")
@@ -179,7 +180,7 @@ model AiGenerationRequest {
     userId        String             @map("user_id")
     user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
     prompt        String             @db.Text
-    creditsCost   Int                @map("credits_cost")
+    creditsCost   Decimal            @map("credits_cost")
     status        AiGenerationStatus @default(PENDING)
     resultSvgPath String?            @map("result_svg_path")
     errorMessage  String?            @map("error_message")

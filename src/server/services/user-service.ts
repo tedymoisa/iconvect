@@ -1,45 +1,10 @@
 import { tryCatch } from "@/lib/try-catch";
 import { CreditTransactionType, type PrismaClient } from "@prisma/client";
+import { type Decimal } from "@prisma/client/runtime/library";
 import { TRPCError } from "@trpc/server";
 
 export const userService = {
-  checkSufficientCredits: async (db: PrismaClient, userId: string, requiredCredits: number): Promise<void> => {
-    if (requiredCredits <= 0) return; // No check needed for zero/negative cost
-
-    const { data: user, error } = await tryCatch(
-      db.user.findUnique({
-        where: { id: userId },
-        select: { credits: true }
-      })
-    );
-
-    if (error) {
-      console.error(`Database error during credit check for user ${userId}:`, error);
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to check user credits due to a database error.",
-        cause: error
-      });
-    }
-
-    if (!user) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "User not found."
-      });
-    }
-
-    if (user.credits < requiredCredits) {
-      throw new TRPCError({
-        code: "BAD_REQUEST",
-        message: `Insufficient credits. Requires ${requiredCredits}, you have ${user.credits}.`
-      });
-    }
-
-    console.log(`User ${userId} credit check passed. Has ${user.credits}, requires ${requiredCredits}.`);
-  },
-
-  deductCredits: async (db: PrismaClient, userId: string, cost: number): Promise<void> => {
+  deductCredits: async (db: PrismaClient, userId: string, cost: Decimal): Promise<void> => {
     const description = "Credit deduction for AI generation";
 
     const { error } = await tryCatch(
@@ -57,9 +22,9 @@ export const userService = {
         // 2. Verify sufficient credits within the transaction
         if (user.credits < cost) {
           console.warn(
-            `User ${userId} credits became insufficient (${user.credits}) before deduction (${cost}) could complete.`
+            `User ${userId} credits became insufficient (${String(user.credits)}) before deduction (${String(cost)}) could complete.`
           );
-          throw new Error(`Insufficient credits. ${cost} required.`);
+          throw new Error(`Insufficient credits. ${String(cost)} required.`);
         }
 
         // 3. Deduct credits
@@ -77,7 +42,7 @@ export const userService = {
         await tx.creditTransaction.create({
           data: {
             userId: userId,
-            amount: -cost,
+            amount: cost,
             type: CreditTransactionType.GENERATION,
             description: description
           }
@@ -93,6 +58,6 @@ export const userService = {
       throw new Error("Failed to deduct credits due to a database error.");
     }
 
-    console.log(`Successfully deducted ${cost} credits from user ${userId}.`);
+    console.log(`Successfully deducted ${String(cost)} credits from user ${userId}.`);
   }
 };
