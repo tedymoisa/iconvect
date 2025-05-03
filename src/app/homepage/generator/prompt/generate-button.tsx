@@ -2,7 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Sparkles } from "lucide-react";
 import { memo } from "react";
 
-const GenerateButton = memo(({ isPending, prompt }: { isPending: boolean; prompt: string }) => {
+type GenerateButtonProps = {
+  isPending: boolean;
+  prompt: string;
+};
+
+const GenerateButton = ({ isPending, prompt }: GenerateButtonProps) => {
   console.log("GenerateButton");
 
   return (
@@ -20,6 +25,6 @@ const GenerateButton = memo(({ isPending, prompt }: { isPending: boolean; prompt
       )}
     </Button>
   );
-});
+};
 
-export default GenerateButton;
+export default memo(GenerateButton);

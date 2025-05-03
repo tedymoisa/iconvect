@@ -12,7 +12,11 @@ import { useModelStore } from "@/store/model";
 import { ChevronDown, Brain, Coins } from "lucide-react";
 import { memo } from "react";
 
-const ModelSelector = memo(({ isPending }: { isPending: boolean }) => {
+type ModelSelectorProps = {
+  isPending: boolean;
+};
+
+function ModelSelector({ isPending }: ModelSelectorProps) {
   console.log("ModelSelector");
 
   const selectedModel = useModelStore((s) => s.selectedModel);
@@ -54,10 +58,11 @@ const ModelSelector = memo(({ isPending }: { isPending: boolean }) => {
         {selectedModel.description} <Brain className="h-4 w-4" />
       </div>
       <div className="text-muted-foreground flex items-center gap-1 border-l-2 pl-2 text-sm">
-        Cost: <span className="text-primary font-bold">{selectedModel.cost}</span> <Coins className="h-4 w-4" />
+        Cost: <span className="text-primary font-bold">{selectedModel.cost}</span>
+        <Coins className="h-4 w-4" />
       </div>
     </div>
   );
-});
+}
 
-export default ModelSelector;
+export default memo(ModelSelector);
