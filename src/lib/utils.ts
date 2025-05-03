@@ -1,7 +1,8 @@
+import { Prisma } from "@prisma/client";
 import { clsx, type ClassValue } from "clsx";
 import { type NextRequest } from "next/server";
 import { twMerge } from "tailwind-merge";
-import { type SafeParseReturnType, type ZodError, type ZodSchema } from "zod";
+import { z, type SafeParseReturnType, type ZodError, type ZodSchema } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -53,3 +54,26 @@ export function scrollPage(by: number, duration: number) {
 
   requestAnimationFrame(step);
 }
+
+export const zDecimal = z
+  .union(
+    [
+      z.number().finite({ message: "Number must be finite." }),
+      z.string().refine(
+        (val) => {
+          try {
+            new Prisma.Decimal(val);
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        { message: "Invalid decimal string format." }
+      ),
+      z.instanceof(Prisma.Decimal)
+    ],
+    {
+      invalid_type_error: "Expected number, valid decimal string, or Decimal instance."
+    }
+  )
+  .transform((val) => (val instanceof Prisma.Decimal ? val : new Prisma.Decimal(val)));

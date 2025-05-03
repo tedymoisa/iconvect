@@ -8,7 +8,7 @@ CREATE TYPE "PaymentProvider" AS ENUM ('STRIPE', 'PAYPAL');
 CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'COMPLETED', 'FAILED', 'CANCELLED', 'REFUNDED');
 
 -- CreateEnum
-CREATE TYPE "CreditTransactionType" AS ENUM ('PURCHASE', 'GENERATION', 'TRIAL_GRANT', 'REFUND', 'ADJUSTMENT');
+CREATE TYPE "CreditTransactionType" AS ENUM ('PURCHASE', 'GENERATION', 'TRIAL_GRANT', 'SAVE_TO_LIBRARY', 'REFUND', 'ADJUSTMENT');
 
 -- CreateEnum
 CREATE TYPE "AiGenerationStatus" AS ENUM ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED');
@@ -49,7 +49,7 @@ CREATE TABLE "users" (
     "email" TEXT,
     "email_verified" TIMESTAMP(3),
     "image" TEXT,
-    "credits" INTEGER NOT NULL DEFAULT 15,
+    "credits" DECIMAL(65,30) NOT NULL DEFAULT 15,
     "status" "UserStatus" NOT NULL DEFAULT 'TRIAL',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE "verification_tokens" (
 CREATE TABLE "credit_transactions" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
-    "amount" INTEGER NOT NULL,
+    "amount" DECIMAL(65,30) NOT NULL,
     "type" "CreditTransactionType" NOT NULL,
     "description" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -118,7 +118,7 @@ CREATE TABLE "ai_generation_requests" (
     "id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "prompt" TEXT NOT NULL,
-    "credits_cost" INTEGER NOT NULL,
+    "credits_cost" DECIMAL(65,30) NOT NULL,
     "status" "AiGenerationStatus" NOT NULL DEFAULT 'PENDING',
     "result_svg_path" TEXT,
     "error_message" TEXT,

@@ -1,5 +1,6 @@
 import { env } from "@/env";
 import { type AiModelOption } from "@/store/model";
+import { Prisma } from "@prisma/client";
 
 export const apiUrl = env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
@@ -28,13 +29,13 @@ export const AI_MODELS: Record<keyof typeof ICONVECT_AI_MODELS, AiModelOption> =
     description: "Fast model",
     model: ICONVECT_AI_MODELS.SVG_TURBO,
     generator: ICONVECT_AI_GENERATORS.GEMINI,
-    cost: 1
+    cost: new Prisma.Decimal(0.5)
   },
   SVG_PICASSO: {
     name: "SVG Picasso",
     description: "Slow reasoning and accurate",
     model: ICONVECT_AI_MODELS.SVG_PICASSO,
     generator: ICONVECT_AI_GENERATORS.GEMINI,
-    cost: 2
+    cost: new Prisma.Decimal(1)
   }
 };

@@ -3,8 +3,7 @@ import { tryCatch, tryCatchSync } from "@/lib/try-catch";
 import { type ApiResponse } from "@/lib/types/api-response";
 import { db } from "@/server/db";
 import { stripeClient } from "@/server/stripe";
-import { CreditTransactionType, OrderStatus, UserStatus } from "@prisma/client";
-import { Decimal } from "@prisma/client/runtime/library";
+import { CreditTransactionType, OrderStatus, Prisma, UserStatus } from "@prisma/client";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
@@ -67,7 +66,7 @@ async function checkoutSessionCompleted(event: Stripe.Event) {
       return NextResponse.json<ApiResponse<string>>({ result: "Already processed." }, { status: 200 });
     }
 
-    const amountDecimal = new Decimal((session.amount_total ?? 0) / 100);
+    const amountDecimal = new Prisma.Decimal((session.amount_total ?? 0) / 100);
 
     const { error: transactionError } = await tryCatch(
       db.$transaction(async (tx) => {
@@ -95,7 +94,7 @@ async function checkoutSessionCompleted(event: Stripe.Event) {
         await tx.creditTransaction.create({
           data: {
             userId: userId,
-            amount: numberOfCredits,
+            amount: new Prisma.Decimal(numberOfCredits),
             type: CreditTransactionType.PURCHASE,
             description: `Purchase via Stripe Checkout: ${session.id}`,
             orderId: order.id
@@ -106,7 +105,7 @@ async function checkoutSessionCompleted(event: Stripe.Event) {
         await tx.user.update({
           where: { id: userId },
           data: {
-            credits: { increment: numberOfCredits },
+            credits: { increment: new Prisma.Decimal(numberOfCredits) },
             status: UserStatus.SUBSCRIBED
           }
         });
