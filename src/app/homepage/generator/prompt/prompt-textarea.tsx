@@ -7,7 +7,7 @@ type PromptTextareaProps = {
   formRef: React.RefObject<HTMLFormElement>;
 };
 
-const PromptTextarea = memo(({ prompt, setPrompt, formRef }: PromptTextareaProps) => {
+function PromptTextarea({ prompt, setPrompt, formRef }: PromptTextareaProps) {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [localValue, setLocalValue] = useState(prompt);
   console.log("PromptTextarea");
@@ -16,12 +16,12 @@ const PromptTextarea = memo(({ prompt, setPrompt, formRef }: PromptTextareaProps
     setLocalValue(prompt);
   }, [prompt]);
 
-  const debounce = <T extends (...args: any[]) => void>(func: T, wait: number): ((...args: Parameters<T>) => void) => {
+  const debounce = <F extends (arg: string) => void>(func: F, wait: number): ((arg: string) => void) => {
     let timeout: ReturnType<typeof setTimeout>;
-    return (...args: Parameters<T>) => {
+    return (arg: string) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        func(...args);
+        func(arg);
       }, wait);
     };
   };
@@ -76,6 +76,6 @@ const PromptTextarea = memo(({ prompt, setPrompt, formRef }: PromptTextareaProps
       onKeyDown={handleKeyDown}
     />
   );
-});
+}
 
-export default PromptTextarea;
+export default memo(PromptTextarea);

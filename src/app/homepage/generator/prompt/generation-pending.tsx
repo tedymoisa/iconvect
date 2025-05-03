@@ -3,7 +3,7 @@ import SvgLoading from "../svg-loading";
 import { memo } from "react";
 import { X } from "lucide-react";
 
-const GenerationPending = memo(() => {
+const GenerationPending = () => {
   console.log("GenerationPending");
 
   return (
@@ -19,6 +19,6 @@ const GenerationPending = memo(() => {
       </div>
     </div>
   );
-});
+};
 
-export default GenerationPending;
+export default memo(GenerationPending);
