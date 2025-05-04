@@ -9,6 +9,7 @@ import { siteConfig } from "@/site-config";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import Providers from "./providers";
+import IubendaConsentSolution from "@/components/iubenda-consent-solution";
 
 export const metadata: Metadata = {
   title: siteConfig.name,
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={`${GeistSans.variable} h-dvh w-full`} suppressHydrationWarning={true}>
       <head>
         <JsonLdWebsite />
+        <IubendaConsentSolution />
       </head>
       <body>
         <Providers>
