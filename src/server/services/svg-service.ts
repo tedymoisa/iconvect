@@ -65,7 +65,7 @@ export const svgService = {
 
     console.log("Raw SVG received from Gemini:", rawSvg);
 
-    return rawSvg;
+    return svgService.stripXmlCodeBlock(rawSvg);
   },
 
   openaiSvg: async (model: ICONVECT_AI_MODELS, prompt: string) => {
@@ -105,6 +105,18 @@ export const svgService = {
 
     console.log("Raw content received from OpenAI:", rawSvg);
 
-    return rawSvg;
+    return svgService.stripXmlCodeBlock(rawSvg);
+  },
+
+  stripXmlCodeBlock: (input: string): string => {
+    const trimmedInput = input.trim();
+    const codeBlockRegex = /^```(?:xml)?\s*([\s\S]*?)\s*```$/i;
+    const match = codeBlockRegex.exec(trimmedInput); // Use exec()
+
+    if (match && typeof match[1] === "string") {
+      return match[1].trim();
+    } else {
+      return input;
+    }
   }
 };
