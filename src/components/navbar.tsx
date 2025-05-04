@@ -2,15 +2,15 @@
 
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
+import { useSessionStore } from "@/store/session";
+import type { Decimal } from "@prisma/client/runtime/library";
 import { Coins, Menu, X } from "lucide-react";
-import type { Session } from "next-auth";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Logo from "./logo";
 import ThemeChanger from "./theme-changer";
 import { Button } from "./ui/button";
-import UserProfileIcon from "./user-profile-menu";
+import UserProfileMenu from "./user-profile-menu";
 
 const navigation = [
   {
@@ -159,8 +159,12 @@ const HamburgerMenu = () => {
 };
 
 const LeftSideNavbar = () => {
-  const { data: session, status } = useSession();
-  const { setIsOpen } = useDialogStore();
+  const setIsOpen = useDialogStore((s) => s.setIsOpen);
+  const session = useSessionStore((s) => s.session);
+  const status = useSessionStore((s) => s.status);
+
+  const credits = session?.user.credits;
+  const userImage = session?.user.image;
 
   const isAuthenticated = status === "authenticated";
 
@@ -172,8 +176,8 @@ const LeftSideNavbar = () => {
     <div className={cn("flex items-center gap-x-4")}>
       {isAuthenticated ? (
         <>
-          <Credits session={session} />
-          <UserProfileIcon session={session} />
+          {credits && <Credits credits={credits} />}
+          {userImage && <UserProfileMenu imagePath={userImage} />}
         </>
       ) : (
         <Button onClick={() => setIsOpen(true)}>Login</Button>
@@ -182,12 +186,12 @@ const LeftSideNavbar = () => {
   );
 };
 
-const Credits = ({ session }: { session: Session }) => {
+const Credits = ({ credits }: { credits: Decimal }) => {
   return (
     <Link href="/prices">
       <div className="bg-muted flex w-fit items-center gap-x-1 rounded-md border px-3 py-1 text-sm">
         <Coins className="h-4 w-4" />
-        <span className="font-bold">{String(session.user.credits)}</span>
+        <span className="font-bold">{String(credits)}</span>
       </div>
     </Link>
   );

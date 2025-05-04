@@ -8,8 +8,6 @@ type GenerateButtonProps = {
 };
 
 const GenerateButton = ({ isPending, prompt }: GenerateButtonProps) => {
-  console.log("GenerateButton");
-
   return (
     <Button type="submit" disabled={isPending || !prompt.trim()} size="lg" className="mx-auto sm:mx-0">
       {isPending ? (

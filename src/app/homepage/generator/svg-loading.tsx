@@ -4,7 +4,6 @@ import { TextLoader } from "@/components/loading";
 import React from "react";
 
 export default function SvgLoading() {
-  console.log("SvgLoading");
   return (
     <TextLoader
       messages={[

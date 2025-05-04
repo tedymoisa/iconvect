@@ -10,15 +10,15 @@ import {
 import { AI_MODELS } from "@/lib/constants";
 import { useModelStore } from "@/store/model";
 import { ChevronDown, Brain, Coins } from "lucide-react";
+import type { Session } from "next-auth";
 import { memo } from "react";
 
 type ModelSelectorProps = {
   isPending: boolean;
+  session: Session | null;
 };
 
-function ModelSelector({ isPending }: ModelSelectorProps) {
-  console.log("ModelSelector");
-
+function ModelSelector({ isPending, session }: ModelSelectorProps) {
   const selectedModel = useModelStore((s) => s.selectedModel);
   const setSelectedModel = useModelStore((s) => s.setSelectedModel);
 
@@ -57,10 +57,12 @@ function ModelSelector({ isPending }: ModelSelectorProps) {
       <div className="text-muted-foreground flex items-center gap-1 text-sm">
         {selectedModel.description} <Brain className="h-4 w-4" />
       </div>
-      <div className="text-muted-foreground flex items-center gap-1 border-l-2 pl-2 text-sm">
-        Cost: <span className="text-primary font-bold">{String(selectedModel.cost)}</span>
-        <Coins className="h-4 w-4" />
-      </div>
+      {session && (
+        <div className="text-muted-foreground flex items-center gap-1 border-l-2 pl-2 text-sm">
+          Cost: <span className="text-primary font-bold">{String(selectedModel.cost)}</span>
+          <Coins className="h-4 w-4" />
+        </div>
+      )}
     </div>
   );
 }
