@@ -7,7 +7,7 @@ type PromptTextareaProps = {
   formRef: React.RefObject<HTMLFormElement>;
 };
 
-function PromptTextarea({ prompt, setPrompt, formRef }: PromptTextareaProps) {
+const PromptTextarea = ({ prompt, setPrompt, formRef }: PromptTextareaProps) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [localValue, setLocalValue] = useState(prompt);
   console.log("PromptTextarea");
@@ -76,6 +76,6 @@ function PromptTextarea({ prompt, setPrompt, formRef }: PromptTextareaProps) {
       onKeyDown={handleKeyDown}
     />
   );
-}
+};
 
 export default memo(PromptTextarea);

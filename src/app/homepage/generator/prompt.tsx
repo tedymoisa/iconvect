@@ -3,6 +3,7 @@
 import { AI_MODELS } from "@/lib/constants";
 import { scrollPage } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
+import { useSessionStore } from "@/store/session";
 import { useSvgStore } from "@/store/svg";
 import { api } from "@/trpc/react";
 import { useSession } from "next-auth/react";
@@ -16,9 +17,10 @@ import PromptTextarea from "./prompt/prompt-textarea";
 export default function Prompt() {
   console.log("Prompt");
 
-  const { data: session, update } = useSession();
+  const { update } = useSession();
   const [prompt, setPrompt] = useState("");
 
+  const session = useSessionStore((s) => s.session);
   const setGeneratedSvg = useSvgStore((s) => s.setGeneratedSvg);
   const setIsOpen = useDialogStore((s) => s.setIsOpen);
 
