@@ -6,7 +6,8 @@ export function JsonLdWebsite() {
     "@type": "WebSite",
     name: siteConfig.name,
     url: siteConfig.url,
-    description: siteConfig.description
+    description: siteConfig.description,
+    image: siteConfig.ogImage
   };
 
   return (

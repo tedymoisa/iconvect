@@ -2,18 +2,31 @@
 
 import { cn } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
-import { useSession } from "next-auth/react";
+import { useSessionStore } from "@/store/session";
+import type { Decimal } from "@prisma/client/runtime/library";
+import { Coins, Menu, X } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import Logo from "./logo";
+import ThemeChanger from "./theme-changer";
 import { Button } from "./ui/button";
-import UserProfileIcon from "./user-profile-menu";
+import UserProfileMenu from "./user-profile-menu";
+
+const navigation = [
+  {
+    name: "Homepage",
+    href: "/"
+  },
+  {
+    name: "Prices",
+    href: "/prices"
+  }
+];
 
 export default function Navbar() {
-  const { data: session } = useSession();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isCursorAtTop, setIsCursorAtTop] = useState(false);
-  const { setIsOpen } = useDialogStore();
 
   useEffect(() => {
     const scrollHideThreshold = 50;
@@ -65,30 +78,121 @@ export default function Navbar() {
   return (
     <nav
       className={cn(
-        "fixed left-0 top-0 z-50 w-full transition-transform duration-300 ease-in-out",
+        "bg-background fixed top-0 left-0 z-50 w-full transition-transform duration-300 ease-in-out",
         isVisible ? "translate-y-0" : "-translate-y-full"
       )}
     >
-      <div className="mx-auto my-3 max-w-5xl px-4">
-        <div className="flex h-16 items-center justify-between rounded-lg border border-border bg-card p-4 shadow-lg shadow-purple-950/20 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
+        <Link href="/">
           <div className="flex items-center gap-x-4">
-            <Logo className="h-10 w-auto shrink-0 text-primary md:h-12" />
-            <span className="hidden border-l border-border pl-4 text-sm text-muted-foreground sm:block">
-              Custom Icons for your projects
-            </span>
+            <Logo />
+            <span className="text-2xl font-extrabold tracking-tight">IconVect</span>
           </div>
+        </Link>
 
-          <div className="flex items-center gap-x-4">
-            {session && (
-              <div className="hidden rounded-md border border-border/50 bg-muted/50 px-3 py-1 text-sm md:block">
-                <span className="mr-1.5 text-muted-foreground/80">Credits:</span>
-                <span className="font-medium text-primary">{session.user.credits}</span>
-              </div>
-            )}
-            {session ? <UserProfileIcon session={session} /> : <Button onClick={() => setIsOpen(true)}>Login</Button>}
-          </div>
+        <div className="flex items-center gap-x-4">
+          <NavbarLinks />
+          <LeftSideNavbar />
+          <HamburgerMenu />
         </div>
       </div>
     </nav>
   );
 }
+
+const NavbarLinks = () => {
+  return (
+    <div className="hidden gap-x-4 md:flex">
+      <ThemeChanger />
+      {navigation.map((item) => (
+        <Button key={item.name} asChild variant={"ghost"}>
+          <Link href={item.href} prefetch={true}>
+            {item.name}
+          </Link>
+        </Button>
+      ))}
+    </div>
+  );
+};
+
+const HamburgerMenu = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  return (
+    <div className="flex md:hidden">
+      <Button
+        size="icon"
+        variant="ghost"
+        onClick={() => setMobileMenuOpen((open) => !open)}
+        aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+        className="size-7"
+        asChild
+      >
+        {mobileMenuOpen ? <X /> : <Menu />}
+      </Button>
+
+      <div
+        className={cn(
+          "absolute top-16 left-0 w-full overflow-hidden transition-all duration-300 md:hidden",
+          mobileMenuOpen ? "max-h-[500px] opacity-100" : "pointer-events-none max-h-0 opacity-0"
+        )}
+      >
+        <div className="flex flex-col gap-y-2 border-b p-4 backdrop-blur-lg">
+          {navigation.map((item) => (
+            <Button
+              key={item.name}
+              asChild
+              variant={"secondary"}
+              className="w-fit justify-start"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Link href={item.href} prefetch={true}>
+                {item.name}
+              </Link>
+            </Button>
+          ))}
+          <ThemeChanger />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const LeftSideNavbar = () => {
+  const setIsOpen = useDialogStore((s) => s.setIsOpen);
+  const session = useSessionStore((s) => s.session);
+  const status = useSessionStore((s) => s.status);
+
+  const credits = session?.user.credits;
+  const userImage = session?.user.image;
+
+  const isAuthenticated = status === "authenticated";
+
+  if (status === "loading") {
+    return undefined;
+  }
+
+  return (
+    <div className={cn("flex items-center gap-x-4")}>
+      {isAuthenticated ? (
+        <>
+          {credits && <Credits credits={credits} />}
+          {userImage && <UserProfileMenu imagePath={userImage} />}
+        </>
+      ) : (
+        <Button onClick={() => setIsOpen(true)}>Login</Button>
+      )}
+    </div>
+  );
+};
+
+const Credits = ({ credits }: { credits: Decimal }) => {
+  return (
+    <Link href="/prices">
+      <div className="bg-muted flex w-fit items-center gap-x-1 rounded-md border px-3 py-1 text-sm">
+        <Coins className="h-4 w-4" />
+        <span className="font-bold">{String(credits)}</span>
+      </div>
+    </Link>
+  );
+};

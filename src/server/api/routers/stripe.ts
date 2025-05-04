@@ -1,42 +1,58 @@
+import { apiUrl } from "@/lib/constants";
 import { stripeClient } from "@/server/stripe";
 import { TRPCError } from "@trpc/server";
 import Stripe from "stripe";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { apiUrl } from "@/lib/constants";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { tryCatch } from "@/lib/try-catch";
+import { cache } from "react";
 
 export const stripeRouter = createTRPCRouter({
-  prices: protectedProcedure.output(z.array(z.custom<Stripe.Price>())).query(async () => {
-    try {
-      const prices = await stripeClient.prices.list({
-        active: true,
-        type: "one_time",
-        currency: "eur",
-        expand: ["data.product"]
-      });
+  prices: publicProcedure.output(z.array(z.custom<Stripe.Price>())).query(async () => {
+    const fetchPricesCached = cache(async () => {
+      const { data: prices, error } = await tryCatch(
+        stripeClient.prices.list({
+          active: true,
+          type: "one_time",
+          currency: "eur",
+          expand: ["data.product"]
+        })
+      );
 
-      const validPrices = prices.data.filter((price) => {
-        const product = price.product as Stripe.Product;
+      if (error) {
+        if (error instanceof Stripe.errors.StripeError) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `Stripe Error: ${error.message}`,
+            cause: error
+          });
+        }
 
-        return product.metadata.credits && typeof price.product === "object";
-      });
-
-      return validPrices;
-    } catch (error: unknown) {
-      if (error instanceof Stripe.errors.StripeError) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: `Stripe Error: ${error.message}`,
+          message: "An unexpected error occurred while fetching prices.",
           cause: error
         });
       }
 
+      return prices;
+    });
+
+    const { data: cachedPrices, error } = await tryCatch(fetchPricesCached());
+    if (error) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "An unexpected error occurred while fetching prices.",
+        message: "An unexpected error occurred while caching prices.",
         cause: error
       });
     }
+
+    const validPrices = cachedPrices.data.filter((price) => {
+      const product = price.product as Stripe.Product;
+      return product.metadata.credits && typeof price.product === "object";
+    });
+
+    return validPrices;
   }),
 
   createCheckoutSession: protectedProcedure
@@ -55,42 +71,52 @@ export const stripeRouter = createTRPCRouter({
       const userEmail = ctx.session.user.email;
       const { priceId } = input;
 
-      try {
-        const price = await stripeClient.prices.retrieve(priceId, {
-          expand: ["product"]
+      // 1. Retrieve price
+      const { data: price, error: priceError } = await tryCatch(
+        stripeClient.prices.retrieve(priceId, { expand: ["product"] })
+      );
+      if (priceError) {
+        console.error("Stripe error retrieving price:", priceError);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to retrieve price from Stripe.",
+          cause: priceError
         });
+      }
 
-        if (!price || !price.active || price.type !== "one_time") {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Invalid or inactive price selected."
-          });
-        }
+      if (!price || !price.active || price.type !== "one_time") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid or inactive price selected."
+        });
+      }
 
-        if (typeof price.product !== "object" || price.product === null || price.product.deleted) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Product details not found for the selected price."
-          });
-        }
-        const product = price.product;
+      if (typeof price.product !== "object" || price.product === null || price.product.deleted) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Product details not found for the selected price."
+        });
+      }
+      const product = price.product;
 
-        const amountInCents = price.unit_amount;
-        const currency = price.currency;
-        const credits = product.metadata.credits;
+      const amountInCents = price.unit_amount;
+      const currency = price.currency;
+      const credits = product.metadata.credits;
 
-        if (!amountInCents || !credits) {
-          console.error("Price configuration error for priceId:", priceId, price);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Price configuration error. Please contact support."
-          });
-        }
+      if (!amountInCents || !credits) {
+        console.error("Price configuration error for priceId:", priceId, price);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Price configuration error. Please contact support."
+        });
+      }
 
-        const successUrl = `${apiUrl}`;
-        const cancelUrl = `${apiUrl}`;
+      const successUrl = `${apiUrl}`;
+      const cancelUrl = `${apiUrl}`;
 
-        const checkoutSession = await stripeClient.checkout.sessions.create({
+      // 2. Create checkout session
+      const { data: checkoutSession, error: sessionError } = await tryCatch(
+        stripeClient.checkout.sessions.create({
           payment_method_types: ["card", "paypal"],
           mode: "payment",
           line_items: [
@@ -109,36 +135,24 @@ export const stripeRouter = createTRPCRouter({
           success_url: successUrl,
           cancel_url: cancelUrl,
           customer_email: userEmail ?? undefined
-        });
-
-        if (!checkoutSession.id) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Could not retrieve session ID after creation."
-          });
-        }
-
-        return { id: checkoutSession.id };
-      } catch (error: unknown) {
-        console.error("Error creating Stripe Checkout Session:", error);
-
-        if (error instanceof Stripe.errors.StripeError) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `Stripe Error: ${error.message}`,
-            cause: error
-          });
-        }
-
-        if (error instanceof TRPCError) {
-          throw error;
-        }
-
+        })
+      );
+      if (sessionError) {
+        console.error("Stripe error creating checkout session:", sessionError);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to create payment session.",
-          cause: error
+          message: "Failed to create Stripe checkout session.",
+          cause: sessionError
         });
       }
+
+      if (!checkoutSession.id) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Could not retrieve session ID after creation."
+        });
+      }
+
+      return { id: checkoutSession.id };
     })
 });

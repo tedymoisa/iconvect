@@ -1,20 +1,24 @@
+import { env } from "@/env";
+import { tryCatch, tryCatchSync } from "@/lib/try-catch";
 import { type ApiResponse } from "@/lib/types/api-response";
 import { db } from "@/server/db";
 import { stripeClient } from "@/server/stripe";
-import { CreditTransactionType, OrderStatus, UserStatus } from "@prisma/client";
-import { Decimal } from "@prisma/client/runtime/library";
+import { CreditTransactionType, OrderStatus, Prisma, UserStatus } from "@prisma/client";
+import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
-  const sig = req.headers.get("stripe-signature");
-  let event: Stripe.Event;
+  const body = await req.text();
+  const headersList = await headers();
+  const signature = headersList.get("stripe-signature");
 
-  try {
-    event = stripeClient.webhooks.constructEvent(await req.text(), sig!, process.env.STRIPE_WEBHOOK_SECRET!);
-  } catch (error) {
-    console.error("Error verifying webhook signature:", error);
-    return NextResponse.json<ApiResponse<string>>({ result: "Webhook Error." }, { status: 400 });
+  const { data: event, error } = tryCatchSync(() =>
+    stripeClient.webhooks.constructEvent(body, signature!, env.STRIPE_WEBHOOK_SECRET)
+  );
+  if (error) {
+    console.error("Stripe webhook signature verification failed:", error);
+    return NextResponse.json({ error: "Invalid webhook signature" }, { status: 400 });
   }
 
   switch (event.type) {
@@ -47,18 +51,25 @@ async function checkoutSessionCompleted(event: Stripe.Event) {
       return NextResponse.json<ApiResponse<string>>({ result: "Invalid metadata." }, { status: 200 });
     }
 
-    const existingOrder = await db.order.findUnique({
-      where: { providerOrderId: session.id }
-    });
+    const { data: existingOrder, error: findOrderError } = await tryCatch(
+      db.order.findUnique({
+        where: { providerOrderId: session.id }
+      })
+    );
+    if (findOrderError) {
+      console.error(`🚨 Failed to check existing order for Session ${session.id}:`, findOrderError);
+      return NextResponse.json<ApiResponse<string>>({ result: "Database error." }, { status: 500 });
+    }
+
     if (existingOrder && existingOrder.status === OrderStatus.COMPLETED) {
       console.log(`🔁 Order ${existingOrder.id} already processed for Session ${session.id}. Skipping.`);
       return NextResponse.json<ApiResponse<string>>({ result: "Already processed." }, { status: 200 });
     }
 
-    try {
-      const amountDecimal = new Decimal((session.amount_total ?? 0) / 100);
+    const amountDecimal = new Prisma.Decimal((session.amount_total ?? 0) / 100);
 
-      await db.$transaction(async (tx) => {
+    const { error: transactionError } = await tryCatch(
+      db.$transaction(async (tx) => {
         // Create/Update Order
         const order = await tx.order.upsert({
           where: { providerOrderId: session.id },
@@ -83,7 +94,7 @@ async function checkoutSessionCompleted(event: Stripe.Event) {
         await tx.creditTransaction.create({
           data: {
             userId: userId,
-            amount: numberOfCredits,
+            amount: new Prisma.Decimal(numberOfCredits),
             type: CreditTransactionType.PURCHASE,
             description: `Purchase via Stripe Checkout: ${session.id}`,
             orderId: order.id
@@ -94,7 +105,7 @@ async function checkoutSessionCompleted(event: Stripe.Event) {
         await tx.user.update({
           where: { id: userId },
           data: {
-            credits: { increment: numberOfCredits },
+            credits: { increment: new Prisma.Decimal(numberOfCredits) },
             status: UserStatus.SUBSCRIBED
           }
         });
@@ -119,9 +130,11 @@ async function checkoutSessionCompleted(event: Stripe.Event) {
         console.log(
           `✅ Successfully processed Session ${session.id}. User ${userId} granted ${numberOfCredits} credits. Order ${order.id} created.`
         );
-      });
-    } catch (error) {
-      console.error(`🚨 Database update failed for Session ${session.id}:`, error);
+      })
+    );
+
+    if (transactionError) {
+      console.error(`🚨 Database update failed for Session ${session.id}:`, transactionError);
       return NextResponse.json<ApiResponse<string>>({ result: "Database update failed." }, { status: 500 });
     }
   } else {

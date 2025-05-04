@@ -1,12 +1,15 @@
 import Navbar from "@/components/navbar";
 import "@/styles/globals.css";
 
+import AuthModal from "@/components/auth-dialog";
+import Footer from "@/components/footer";
+import { ThemeProvider } from "@/components/theme-provider";
+import { JsonLdWebsite } from "@/json-ld-website";
+import { siteConfig } from "@/site-config";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import Providers from "./providers";
-import AuthModal from "@/components/auth-dialog";
-import { siteConfig } from "@/site-config";
-import { JsonLdWebsite } from "@/json-ld-website";
+import IubendaConsentSolution from "@/components/iubenda-consent-solution";
 
 export const metadata: Metadata = {
   title: siteConfig.name,
@@ -47,12 +50,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={`${GeistSans.variable} h-dvh w-full`} suppressHydrationWarning={true}>
       <head>
         <JsonLdWebsite />
+        <IubendaConsentSolution />
       </head>
-      <body className="relative">
+      <body>
         <Providers>
-          <Navbar />
-          <div className="pt-24">{children}</div>
-          <AuthModal />
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <Navbar />
+            <div className="mt-20">{children}</div>
+            <Footer />
+            <AuthModal />
+          </ThemeProvider>
         </Providers>
       </body>
     </html>

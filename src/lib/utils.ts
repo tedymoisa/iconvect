@@ -1,7 +1,8 @@
+import { Prisma } from "@prisma/client";
 import { clsx, type ClassValue } from "clsx";
 import { type NextRequest } from "next/server";
 import { twMerge } from "tailwind-merge";
-import { type SafeParseReturnType, type ZodError, type ZodSchema } from "zod";
+import { z, type SafeParseReturnType, type ZodError, type ZodSchema } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -54,51 +55,25 @@ export function scrollPage(by: number, duration: number) {
   requestAnimationFrame(step);
 }
 
-// export async function sanitizeSvg(rawSvgString: string): Promise<string | null> {
-//   const { JSDOM } = await import("jsdom");
-
-//   try {
-//     const window = new JSDOM("").window;
-
-//     const purify = DOMPurify(window);
-
-//     const cleanSvg = purify.sanitize(rawSvgString, {
-//       USE_PROFILES: { svg: true, svgFilters: true }
-//     });
-
-//     if (cleanSvg.trim() === "") {
-//       console.warn("Sanitization resulted in an empty string. Input might have been invalid or purely malicious.");
-
-//       return null;
-//     }
-
-//     return cleanSvg;
-//   } catch (error) {
-//     console.error("Error during SVG sanitization:", error);
-
-//     return null;
-//   }
-// }
-
-export async function extractAndSanitizeSvg(rawAiResponse: string): Promise<string | null> {
-  const svgRegex = /```(?:xml|svg)\n([\s\S]*?)\n```/;
-  const match = svgRegex.exec(rawAiResponse);
-
-  if (match?.[1]) {
-    const extractedSvg = match[1].trim(); // Get the captured group (SVG code) and trim whitespace
-    if (extractedSvg) {
-      return extractedSvg;
-    } else {
-      console.warn("Extracted SVG content is empty.");
-
-      return null;
+export const zDecimal = z
+  .union(
+    [
+      z.number().finite({ message: "Number must be finite." }),
+      z.string().refine(
+        (val) => {
+          try {
+            new Prisma.Decimal(val);
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        { message: "Invalid decimal string format." }
+      ),
+      z.instanceof(Prisma.Decimal)
+    ],
+    {
+      invalid_type_error: "Expected number, valid decimal string, or Decimal instance."
     }
-  } else {
-    console.warn("Could not extract SVG code from the provided string using regex.");
-    // Optional: Fallback - If no markdown block, try sanitizing the whole input?
-    // Be cautious with this, it might sanitize non-SVG text unnecessarily.
-    // console.warn('Attempting to sanitize the entire input as SVG...');
-    // return sanitizeSvg(rawAiResponse.trim());
-    return null; // Recommended: Return null if extraction fails
-  }
-}
+  )
+  .transform((val) => (val instanceof Prisma.Decimal ? val : new Prisma.Decimal(val)));
