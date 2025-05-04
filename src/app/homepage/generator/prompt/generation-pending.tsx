@@ -4,8 +4,6 @@ import { memo } from "react";
 import { X } from "lucide-react";
 
 const GenerationPending = () => {
-  console.log("GenerationPending");
-
   return (
     <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
       <div className="w-full">
