@@ -2,6 +2,7 @@
 
 import ErrorBoundaryFallback from "@/components/error-boundry-fallback";
 import { PostHogProvider } from "@/components/posthog-provider";
+import { SessionStoreSync } from "@/components/session-store-sync";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TRPCReactProvider } from "@/trpc/react";
@@ -20,6 +21,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         <PostHogProvider>
           <TRPCReactProvider>
             <SessionProvider>
+              <SessionStoreSync />
               <Toaster />
               {children}
             </SessionProvider>
