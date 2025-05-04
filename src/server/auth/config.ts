@@ -5,9 +5,11 @@ import GitHub from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 
 import { db } from "@/server/db";
-import { type UserStatus } from "@prisma/client";
+import { CreditTransactionType, Prisma, type UserStatus } from "@prisma/client";
 import { env } from "@/env";
 import { type Decimal } from "@prisma/client/runtime/library";
+import { logger } from "@/lib/logger";
+import { tryCatch } from "@/lib/try-catch";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -71,5 +73,32 @@ export const authConfig = {
         status: user.status
       }
     })
+  },
+  events: {
+    createUser: async (message) => {
+      logger.info("✨ New user created:", message.user.id, message.user.email);
+
+      const userId = message.user.id;
+      const initialCredits = new Prisma.Decimal(15);
+
+      if (userId) {
+        const { error } = await tryCatch(
+          db.creditTransaction.create({
+            data: {
+              userId: userId,
+              amount: initialCredits,
+              type: CreditTransactionType.TRIAL_GRANT,
+              description: "Initial trial credits granted upon sign-up."
+            }
+          })
+        );
+
+        if (error) {
+          logger.error("❌ Error performing actions during createUser event:", error);
+        }
+
+        logger.info(`✅ Logged initial ${String(initialCredits)} trial credits for user ${userId}`);
+      }
+    }
   }
 } satisfies NextAuthConfig;
