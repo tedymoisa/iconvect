@@ -15,7 +15,7 @@ export const MOCK_SVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24
 
 export enum ICONVECT_AI_MODELS {
   SVG_TURBO = "gemini-2.5-flash-preview-04-17",
-  SVG_PICASSO = "gemini-2.5-pro-preview-04-17"
+  SVG_PICASSO = "gemini-2.5-pro-preview-03-25"
 }
 
 export enum ICONVECT_AI_GENERATORS {
@@ -26,14 +26,14 @@ export enum ICONVECT_AI_GENERATORS {
 export const AI_MODELS: Record<keyof typeof ICONVECT_AI_MODELS, AiModelOption> = {
   SVG_TURBO: {
     name: "SVG Turbo",
-    description: "Fast model",
+    description: "Fast reasoning less accurate",
     model: ICONVECT_AI_MODELS.SVG_TURBO,
     generator: ICONVECT_AI_GENERATORS.GEMINI,
     cost: new Prisma.Decimal(0.5)
   },
   SVG_PICASSO: {
     name: "SVG Picasso",
-    description: "Slow reasoning and accurate",
+    description: "Slow reasoning more accurate",
     model: ICONVECT_AI_MODELS.SVG_PICASSO,
     generator: ICONVECT_AI_GENERATORS.GEMINI,
     cost: new Prisma.Decimal(1)
