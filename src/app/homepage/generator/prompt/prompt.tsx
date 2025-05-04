@@ -1,28 +1,27 @@
 "use client";
 
-import { AI_MODELS } from "@/lib/constants";
 import { scrollPage } from "@/lib/utils";
 import { useDialogStore } from "@/store/dialog";
+import { useModelStore } from "@/store/model";
 import { useSessionStore } from "@/store/session";
 import { useSvgStore } from "@/store/svg";
 import { api } from "@/trpc/react";
 import { useSession } from "next-auth/react";
 import type { FormEvent } from "react";
 import { useCallback, useRef, useState } from "react";
-import GenerateButton from "./prompt/generate-button";
-import GenerationPending from "./prompt/generation-pending";
-import ModelSelector from "./prompt/model-selector";
-import PromptTextarea from "./prompt/prompt-textarea";
+import GenerateButton from "./generate-button";
+import GenerationPending from "./generation-pending";
+import ModelSelector from "./model-selector";
+import PromptTextarea from "./prompt-textarea";
 
 export default function Prompt() {
-  console.log("Prompt");
-
   const { update } = useSession();
   const [prompt, setPrompt] = useState("");
 
   const session = useSessionStore((s) => s.session);
   const setGeneratedSvg = useSvgStore((s) => s.setGeneratedSvg);
   const setIsOpen = useDialogStore((s) => s.setIsOpen);
+  const selectedModel = useModelStore((s) => s.selectedModel);
 
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -38,7 +37,7 @@ export default function Prompt() {
       if (session) {
         if (prompt.length > 0) {
           mutate(
-            { prompt, model: AI_MODELS.SVG_TURBO },
+            { prompt, model: selectedModel },
             {
               onSuccess: (data) => {
                 setGeneratedSvg(data);
@@ -51,7 +50,7 @@ export default function Prompt() {
         setIsOpen(true);
       }
     },
-    [session, prompt, mutate, setGeneratedSvg, setIsOpen]
+    [session, prompt, mutate, setGeneratedSvg, setIsOpen, selectedModel]
   );
 
   if (isPending) {
@@ -62,7 +61,7 @@ export default function Prompt() {
     <form ref={formRef} onSubmit={handleGenerate}>
       <PromptTextarea prompt={prompt} setPrompt={setPrompt} formRef={formRef} />
       <div className="mt-3 flex flex-col-reverse gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <ModelSelector isPending={isPending} />
+        <ModelSelector isPending={isPending} session={session} />
         <GenerateButton isPending={isPending} prompt={prompt} />
       </div>
     </form>

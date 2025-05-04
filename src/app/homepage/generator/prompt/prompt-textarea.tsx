@@ -10,7 +10,6 @@ type PromptTextareaProps = {
 const PromptTextarea = ({ prompt, setPrompt, formRef }: PromptTextareaProps) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [localValue, setLocalValue] = useState(prompt);
-  console.log("PromptTextarea");
 
   useEffect(() => {
     setLocalValue(prompt);

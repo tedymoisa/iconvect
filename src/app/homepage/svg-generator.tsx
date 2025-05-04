@@ -1,4 +1,4 @@
-import Prompt from "./generator/prompt";
+import Prompt from "./generator/prompt/prompt";
 
 export default function SvgGenerator() {
   return (

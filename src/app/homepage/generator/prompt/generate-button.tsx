@@ -9,8 +9,6 @@ type GenerateButtonProps = {
 };
 
 const GenerateButton = ({ isPending, prompt }: GenerateButtonProps) => {
-  console.log("GenerateButton");
-
   return (
     <Button
       type="submit"

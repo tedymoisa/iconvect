@@ -161,11 +161,16 @@ const HamburgerMenu = () => {
 const LeftSideNavbar = () => {
   const setIsOpen = useDialogStore((s) => s.setIsOpen);
   const session = useSessionStore((s) => s.session);
+  const status = useSessionStore((s) => s.status);
 
   const credits = session?.user.credits;
   const userImage = session?.user.image;
 
-  const isAuthenticated = !!session;
+  const isAuthenticated = status === "authenticated";
+
+  if (status === "loading") {
+    return undefined;
+  }
 
   return (
     <div className={cn("flex items-center gap-x-4")}>
