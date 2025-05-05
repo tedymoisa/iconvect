@@ -8,10 +8,7 @@ export function Heading({ text }: { text: string }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
   return (
-    <h1
-      ref={ref}
-      className="text-primary text-center text-3xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
-    >
+    <h1 ref={ref} className="text-primary text-3xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-6xl">
       {text.split("").map((letter, index) => (
         <motion.span
           key={index}

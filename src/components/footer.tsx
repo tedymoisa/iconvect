@@ -8,7 +8,7 @@ export default function Footer() {
 
   return (
     <footer className="mx-auto flex h-16 max-w-5xl items-center justify-center">
-      <p className="text-muted-foreground text-sm">© {year} IconVect. All rights reserved.</p>
+      <p className="text-muted-foreground text-xs">© {year} IconVect. All rights reserved.</p>
 
       <IubendaLinks />
     </footer>

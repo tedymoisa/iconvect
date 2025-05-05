@@ -6,22 +6,22 @@ import SvgGenerator from "./svg-generator";
 export default function HomePage() {
   return (
     <Background>
-      <main className="mx-auto flex min-h-[calc(100vh-4rem-5rem)] flex-col items-center justify-center px-4">
+      <main className="flex min-h-[calc(100vh-4rem-5rem)] flex-col justify-center px-4">
         <BlurIn>
-          <div className={"bg-secondary mx-auto w-fit rounded-xl border p-1 px-3 text-sm"}>Release v1.0.0</div>
-          <div className="mt-5 flex max-w-3xl flex-col items-center">
-            <Heading text="Your Projects, Your Icons" />
-            <h2 className="text-muted-foreground md:text-l mt-5 text-center text-base sm:text-lg">
-              Generate stunning, unique vector icons instantly using the power of Al. Create scalable SVG assets for
-              your projects in seconds.
-            </h2>
-            <div className="mt-12 w-full">
-              <p className="text-muted-foreground mb-4 text-center text-base font-semibold sm:text-lg md:text-xl">
+          <div className="mx-auto max-w-3xl">
+            <div className="text-center">
+              <div className={"bg-secondary mx-auto mb-5 w-fit rounded-xl border p-1 px-3 text-sm"}>Release v1.0.0</div>
+              <Heading text="Your Projects, Your Icons" />
+              <h2 className="text-muted-foreground text-md mt-5 mb-10">
+                Create scalable Icons for your projects in seconds. Generate stunning, unique vector icons instantly
+                using the power of AI
+              </h2>
+              <p className="text-muted-foreground mb-4 font-semibold sm:text-lg md:text-xl">
                 What do you want to create?
               </p>
-              <SvgGenerator />
-              <SvgPreview />
             </div>
+            <SvgGenerator />
+            <SvgPreview />
           </div>
         </BlurIn>
       </main>
