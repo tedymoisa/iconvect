@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import Logo from "./logo";
 import ThemeChanger from "./theme-changer";
 import { Button } from "./ui/button";
-import UserProfileIcon from "./user-profile-menu";
+import UserProfileMenu from "./user-profile-menu";
 
 const navigation = [
   {
@@ -177,7 +177,7 @@ const LeftSideNavbar = () => {
       {isAuthenticated ? (
         <>
           {credits && <Credits credits={credits} />}
-          {userImage && <UserProfileIcon imagePath={userImage} />}
+          {userImage && <UserProfileMenu imagePath={userImage} />}
         </>
       ) : (
         <Button onClick={() => setIsOpen(true)}>Login</Button>
