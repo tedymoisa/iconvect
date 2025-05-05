@@ -128,3 +128,7 @@
     background-position: 200% 0;
   }
 }
+
+.iub__us-widget {
+  display: none !important;
+}
