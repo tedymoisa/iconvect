@@ -20,7 +20,7 @@ const IubendaLinks = () => {
   }, []);
 
   return (
-    <>
+    <div className="flex gap-2">
       <a
         href="https://www.iubenda.com/privacy-policy/68695295"
         className="iubenda-black iubenda-noiframe iubenda-embed iubenda-noiframe"
@@ -35,7 +35,7 @@ const IubendaLinks = () => {
       >
         Cookie Policy
       </a>
-    </>
+    </div>
   );
 };
 
