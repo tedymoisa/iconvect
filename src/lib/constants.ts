@@ -15,7 +15,7 @@ export const MOCK_SVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24
 
 export enum ICONVECT_AI_MODELS {
   SVG_TURBO = "gemini-2.5-flash-preview-04-17",
-  SVG_PICASSO = "gemini-2.5-pro-preview-03-25"
+  SVG_PICASSO = "gemini-2.5-pro-preview-05-06"
 }
 
 export enum ICONVECT_AI_GENERATORS {

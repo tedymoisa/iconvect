@@ -3,6 +3,8 @@ import { clsx, type ClassValue } from "clsx";
 import { type NextRequest } from "next/server";
 import { twMerge } from "tailwind-merge";
 import { z, type SafeParseReturnType, type ZodError, type ZodSchema } from "zod";
+import { logger } from "./logger";
+import { tryCatch } from "./try-catch";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -77,3 +79,39 @@ export const zDecimal = z
     }
   )
   .transform((val) => (val instanceof Prisma.Decimal ? val : new Prisma.Decimal(val)));
+
+export async function fetchWithTimeout(
+  url: RequestInfo | URL,
+  options: RequestInit & { timeout?: number } = {}
+): Promise<Response> {
+  const { timeout = 60000 } = options;
+
+  let urlString: string;
+  if (typeof url === "string") {
+    urlString = url;
+  } else if (url instanceof URL) {
+    urlString = url.href;
+  } else {
+    urlString = url.url;
+  }
+
+  const controller = new AbortController();
+  const id = setTimeout(() => {
+    logger.warn(`Aborting fetch request to ${urlString} due to timeout (${timeout}ms)`);
+    controller.abort();
+  }, timeout);
+
+  const { data, error } = await tryCatch(
+    fetch(urlString, {
+      ...options,
+      signal: controller.signal
+    })
+  );
+  if (error) {
+    logger.error(`Fetch to ${urlString} aborted due to timeout.`);
+    throw new Error(`Request timed out after ${timeout}ms`);
+  }
+
+  clearTimeout(id);
+  return data;
+}

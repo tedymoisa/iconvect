@@ -9,6 +9,7 @@ import SuperJSON from "superjson";
 
 import { type AppRouter } from "@/server/api/root";
 import { createQueryClient } from "./query-client";
+import { fetchWithTimeout } from "@/lib/utils";
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined;
 const getQueryClient = () => {
@@ -55,6 +56,12 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
             const headers = new Headers();
             headers.set("x-trpc-source", "nextjs-react");
             return headers;
+          },
+          fetch: (url, options) => {
+            return fetchWithTimeout(url, {
+              ...options,
+              timeout: 120000
+            });
           }
         })
       ]
